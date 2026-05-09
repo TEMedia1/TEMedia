@@ -24,25 +24,30 @@
     }
 
     #mapContainer {
-      width: 100%;
-      height: 100vh;
-      position: relative;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 350px;
+  bottom: 0;
+  z-index: 1;
+};
     }
 
     /* Right Side GUI */
     #sidebar {
-      position: fixed;
-      right: 0;
-      top: 0;
-      width: 350px;
-      height: 100vh;
-      background: white;
-      box-shadow: -2px 0 15px rgba(0, 0, 0, 0.2);
-      overflow-y: auto;
-      padding: 20px;
-      box-sizing: border-box;
-      border-left: 2px solid #ddd;
-      z-index: 100;
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 350px;
+  height: 100vh;
+  background: white;
+  box-shadow: -2px 0 15px rgba(0, 0, 0, 0.2);
+  overflow-y: auto;
+  padding: 20px;
+  box-sizing: border-box;
+  border-left: 2px solid #ddd;
+  z-index: 1000;
+}
     }
 
     .sidebar-header {
