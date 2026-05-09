@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Australian Emergency Service</title>
+    <title>Australian Emergency Service - Loading</title>
     <style>
         * {
             margin: 0;
@@ -12,35 +12,31 @@
         }
 
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: Arial, sans-serif;
             height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            background: linear-gradient(135deg, #1a1a2e 0%, #0f3460 50%, #16213e 100%);
+            background: #f5f5f5;
             overflow: hidden;
         }
 
         .loading-container {
             text-align: center;
-            color: white;
             max-width: 600px;
         }
 
         .game-title {
-            font-size: 3.5rem;
+            font-size: 2.5rem;
             font-weight: bold;
-            margin-bottom: 15px;
-            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
-            letter-spacing: 2px;
+            margin-bottom: 30px;
+            color: #333;
         }
 
         .game-subtitle {
-            font-size: 1.2rem;
-            margin-bottom: 50px;
-            color: #00d4ff;
-            font-style: italic;
-            text-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+            font-size: 1.1rem;
+            margin-bottom: 40px;
+            color: #666;
         }
 
         .emergency-services {
@@ -55,100 +51,50 @@
             flex-direction: column;
             align-items: center;
             gap: 10px;
-            opacity: 0;
-            animation: slideIn 0.8s ease-out forwards;
-        }
-
-        .service-icon:nth-child(1) { animation-delay: 0.2s; }
-        .service-icon:nth-child(2) { animation-delay: 0.4s; }
-        .service-icon:nth-child(3) { animation-delay: 0.6s; }
-        .service-icon:nth-child(4) { animation-delay: 0.8s; }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
         }
 
         .icon-box {
             width: 80px;
             height: 80px;
-            border-radius: 10px;
+            border-radius: 8px;
             display: flex;
             justify-content: center;
             align-items: center;
             font-size: 2.5rem;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .icon-box:hover {
-            transform: scale(1.1);
-            box-shadow: 0 0 20px currentColor;
-        }
-
-        .fire-station {
-            background: rgba(255, 69, 0, 0.2);
-            border: 2px solid #ff4500;
-            color: #ff6347;
-        }
-
-        .police-station {
-            background: rgba(0, 100, 255, 0.2);
-            border: 2px solid #0064ff;
-            color: #4169e1;
-        }
-
-        .ambulance-station {
-            background: rgba(0, 200, 100, 0.2);
-            border: 2px solid #00c864;
-            color: #00ff7f;
-        }
-
-        .ses-station {
-            background: rgba(255, 165, 0, 0.2);
-            border: 2px solid #ffa500;
-            color: #ffb347;
+            background: #e0e0e0;
+            border: 1px solid #ccc;
         }
 
         .service-label {
             font-size: 0.9rem;
-            font-weight: bold;
+            color: #666;
         }
 
         .loading-bar-container {
             width: 100%;
-            height: 6px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
+            height: 8px;
+            background: #ddd;
+            border-radius: 4px;
             overflow: hidden;
             margin-bottom: 20px;
-            border: 1px solid rgba(0, 212, 255, 0.3);
         }
 
         .loading-bar {
             height: 100%;
-            background: linear-gradient(90deg, #00d4ff 0%, #0099ff 100%);
+            background: #4CAF50;
             width: 0;
             animation: loading 3s ease-in-out forwards;
-            box-shadow: 0 0 10px #00d4ff;
         }
 
         @keyframes loading {
             0% { width: 0; }
-            50% { width: 70%; }
             100% { width: 100%; }
         }
 
         .loading-text {
             font-size: 0.9rem;
-            color: #00d4ff;
+            color: #666;
             margin-top: 10px;
-            letter-spacing: 1px;
         }
 
         .dot {
@@ -156,6 +102,7 @@
             animation: blink 1.4s infinite;
         }
 
+        .dot:nth-child(1) { animation-delay: 0s; }
         .dot:nth-child(2) { animation-delay: 0.2s; }
         .dot:nth-child(3) { animation-delay: 0.4s; }
 
@@ -163,64 +110,28 @@
             0%, 60%, 100% { opacity: 0.3; }
             30% { opacity: 1; }
         }
-
-        .start-button {
-            margin-top: 40px;
-            padding: 15px 50px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            border: 2px solid #00d4ff;
-            background: rgba(0, 212, 255, 0.1);
-            color: #00d4ff;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            opacity: 0;
-            animation: fadeInButton 0.8s ease-out 3s forwards;
-        }
-
-        .start-button:hover {
-            background: rgba(0, 212, 255, 0.3);
-            box-shadow: 0 0 20px #00d4ff;
-            transform: translateY(-2px);
-        }
-
-        .start-button:active {
-            transform: translateY(0);
-        }
-
-        @keyframes fadeInButton {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
     </style>
 </head>
 <body>
     <div class="loading-container">
-        <h1 class="game-title">🚨 Australian Emergency Service 🚨</h1>
+        <h1 class="game-title">Australian Emergency Service</h1>
         <p class="game-subtitle">Emergency Management Simulator</p>
 
         <div class="emergency-services">
             <div class="service-icon">
-                <div class="icon-box fire-station">🚒</div>
+                <div class="icon-box">🚒</div>
                 <div class="service-label">Fire</div>
             </div>
             <div class="service-icon">
-                <div class="icon-box police-station">🚓</div>
+                <div class="icon-box">🚓</div>
                 <div class="service-label">Police</div>
             </div>
             <div class="service-icon">
-                <div class="icon-box ambulance-station">🚑</div>
+                <div class="icon-box">🚑</div>
                 <div class="service-label">Ambulance</div>
             </div>
             <div class="service-icon">
-                <div class="icon-box ses-station">🛟</div>
+                <div class="icon-box">🛟</div>
                 <div class="service-label">SES</div>
             </div>
         </div>
@@ -230,27 +141,15 @@
         </div>
 
         <p class="loading-text">
-            Initializing emergency services<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span>
+            Loading<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span>
         </p>
-
-        <button class="start-button" onclick="startGame()">Start Game</button>
     </div>
 
     <script>
-        function startGame() {
-            // Add click animation
-            event.target.style.transform = 'scale(0.95)';
-            setTimeout(() => {
-                alert('Welcome to Australian Emergency Service!\n\nGame Features:\n- Place emergency stations (Fire, Police, Ambulance, SES)\n- Respond to random emergency calls\n- Dispatch appropriate vehicles\n- Manage your response time\n\nGood luck!');
-                // Here you can redirect to the actual game page
-                // window.location.href = 'game.html';
-            }, 100);
-        }
-
-        // Optional: Auto-start after loading animation completes
-        // setTimeout(() => {
-        //     startGame();
-        // }, 3500);
+        // Redirect to map.html after 3 seconds (when loading animation completes)
+        setTimeout(() => {
+            window.location.href = 'map.html';
+        }, 3000);
     </script>
 </body>
 </html>
