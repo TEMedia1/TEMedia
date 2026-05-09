@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Australian Emergency Service - Loading</title>
+    <title>Australian Emergency Response</title>
     <style>
         * {
             margin: 0;
@@ -12,144 +12,225 @@
         }
 
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
             height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            background: #f5f5f5;
+            background: white;
             overflow: hidden;
         }
 
-        .loading-container {
+        .container {
             text-align: center;
-            max-width: 600px;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .header {
+            margin-bottom: 50px;
         }
 
         .game-title {
             font-size: 2.5rem;
             font-weight: bold;
-            margin-bottom: 30px;
+            margin-bottom: 10px;
             color: #333;
         }
 
         .game-subtitle {
-            font-size: 1.1rem;
-            margin-bottom: 40px;
+            font-size: 1rem;
             color: #666;
         }
 
-        .emergency-services {
+        .auth-container {
             display: flex;
-            justify-content: space-around;
-            margin-bottom: 60px;
             gap: 20px;
-        }
-
-        .service-icon {
-            display: flex;
+            margin-top: 40px;
             flex-direction: column;
-            align-items: center;
-            gap: 10px;
         }
 
-        .icon-box {
-            width: 80px;
-            height: 80px;
+        .auth-section {
+            border: 1px solid #ddd;
+            padding: 30px;
             border-radius: 8px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 2.5rem;
-            background: #e0e0e0;
-            border: 1px solid #ccc;
+            background: #f9f9f9;
         }
 
-        .service-label {
-            font-size: 0.9rem;
-            color: #666;
-        }
-
-        .loading-bar-container {
-            width: 100%;
-            height: 8px;
-            background: #ddd;
-            border-radius: 4px;
-            overflow: hidden;
+        .auth-section h2 {
+            font-size: 1.3rem;
             margin-bottom: 20px;
+            color: #333;
         }
 
-        .loading-bar {
-            height: 100%;
-            background: #4CAF50;
-            width: 0;
-            animation: loading 3s ease-in-out forwards;
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
         }
 
-        @keyframes loading {
-            0% { width: 0; }
-            100% { width: 100%; }
-        }
-
-        .loading-text {
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
             font-size: 0.9rem;
-            color: #666;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #0066cc;
+            box-shadow: 0 0 5px rgba(0, 102, 204, 0.3);
+        }
+
+        .button {
+            width: 100%;
+            padding: 12px;
+            font-size: 1rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .button-primary {
+            background: #0066cc;
+            color: white;
+        }
+
+        .button-primary:hover {
+            background: #0052a3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 102, 204, 0.3);
+        }
+
+        .button-primary:active {
+            transform: translateY(0);
+        }
+
+        .error-message {
+            color: #d32f2f;
+            font-size: 0.9rem;
             margin-top: 10px;
+            display: none;
         }
 
-        .dot {
-            display: inline-block;
-            animation: blink 1.4s infinite;
-        }
-
-        .dot:nth-child(1) { animation-delay: 0s; }
-        .dot:nth-child(2) { animation-delay: 0.2s; }
-        .dot:nth-child(3) { animation-delay: 0.4s; }
-
-        @keyframes blink {
-            0%, 60%, 100% { opacity: 0.3; }
-            30% { opacity: 1; }
+        .success-message {
+            color: #388e3c;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            display: none;
         }
     </style>
 </head>
 <body>
-    <div class="loading-container">
-        <h1 class="game-title">Australian Emergency Service</h1>
-        <p class="game-subtitle">Emergency Management Simulator</p>
-
-        <div class="emergency-services">
-            <div class="service-icon">
-                <div class="icon-box">🚒</div>
-                <div class="service-label">Fire</div>
-            </div>
-            <div class="service-icon">
-                <div class="icon-box">🚓</div>
-                <div class="service-label">Police</div>
-            </div>
-            <div class="service-icon">
-                <div class="icon-box">🚑</div>
-                <div class="service-label">Ambulance</div>
-            </div>
-            <div class="service-icon">
-                <div class="icon-box">🛟</div>
-                <div class="service-label">SES</div>
-            </div>
+    <div class="container">
+        <div class="header">
+            <h1 class="game-title">Australian Emergency Response</h1>
+            <p class="game-subtitle">EST 2026</p>
         </div>
 
-        <div class="loading-bar-container">
-            <div class="loading-bar"></div>
-        </div>
+        <div class="auth-container">
+            <!-- Login Section -->
+            <div class="auth-section">
+                <h2>Login</h2>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="loginUsername">Username</label>
+                        <input type="text" id="loginUsername" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" required>
+                    </div>
+                    <button type="submit" class="button button-primary">Login</button>
+                    <div id="loginError" class="error-message"></div>
+                </form>
+            </div>
 
-        <p class="loading-text">
-            Loading<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span>
-        </p>
+            <!-- Create Account Section -->
+            <div class="auth-section">
+                <h2>Create Account</h2>
+                <form id="createAccountForm">
+                    <div class="form-group">
+                        <label for="createUsername">Username</label>
+                        <input type="text" id="createUsername" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="createPassword">Password</label>
+                        <input type="password" id="createPassword" required>
+                    </div>
+                    <button type="submit" class="button button-primary">Create Account</button>
+                    <div id="createError" class="error-message"></div>
+                    <div id="createSuccess" class="success-message"></div>
+                </form>
+            </div>
+        </div>
     </div>
 
     <script>
-        // Redirect to map.html after 3 seconds (when loading animation completes)
-        setTimeout(() => {
-            window.location.href = 'map.html';
-        }, 3000);
+        // Login form handler
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            const errorDiv = document.getElementById('loginError');
+
+            if (username && password) {
+                // Check if user exists in localStorage
+                const users = JSON.parse(localStorage.getItem('users')) || {};
+                if (users[username] && users[username] === password) {
+                    // Successful login
+                    localStorage.setItem('currentUser', username);
+                    window.location.href = 'map.html';
+                } else {
+                    errorDiv.textContent = 'Invalid username or password';
+                    errorDiv.style.display = 'block';
+                }
+            }
+        });
+
+        // Create account form handler
+        document.getElementById('createAccountForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('createUsername').value;
+            const password = document.getElementById('createPassword').value;
+            const errorDiv = document.getElementById('createError');
+            const successDiv = document.getElementById('createSuccess');
+
+            if (username && password) {
+                const users = JSON.parse(localStorage.getItem('users')) || {};
+                
+                if (users[username]) {
+                    errorDiv.textContent = 'Username already exists';
+                    errorDiv.style.display = 'block';
+                    successDiv.style.display = 'none';
+                } else {
+                    // Create new account
+                    users[username] = password;
+                    localStorage.setItem('users', JSON.stringify(users));
+                    localStorage.setItem('currentUser', username);
+                    
+                    successDiv.textContent = 'Account created successfully! Redirecting...';
+                    successDiv.style.display = 'block';
+                    errorDiv.style.display = 'none';
+                    
+                    setTimeout(() => {
+                        window.location.href = 'map.html';
+                    }, 1500);
+                }
+            }
+        });
     </script>
 </body>
 </html>
