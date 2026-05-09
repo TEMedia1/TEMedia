@@ -1,178 +1,186 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>World Map</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Australian Emergency Response - World Map</title>
 
-  <!-- Leaflet CSS -->
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-  />
+  <!-- Cesium JS for 3D Globe -->
+  <script src="https://cesium.com/downloads/cesiumjs/releases/1.104/Cesium.js"></script>
+  <link href="https://cesium.com/downloads/cesiumjs/releases/1.104/Widgets/widgets.css" rel="stylesheet">
 
   <style>
-    html, body {
+    * {
       margin: 0;
       padding: 0;
-      height: 100%;
-      font-family: Arial, sans-serif;
+      box-sizing: border-box;
     }
 
-    #map {
-      width: calc(100% - 300px);
+    html, body {
+      width: 100%;
+      height: 100%;
+      font-family: 'Arial', sans-serif;
+      overflow: hidden;
+    }
+
+    #cesiumContainer {
+      width: calc(100% - 350px);
       height: 100vh;
-      float: left;
+      position: relative;
     }
 
     /* Right Side GUI */
     #sidebar {
-      width: 300px;
+      position: fixed;
+      right: 0;
+      top: 0;
+      width: 350px;
       height: 100vh;
-      float: right;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      box-shadow: -2px 0 10px rgba(0, 0, 0, 0.3);
+      background: white;
+      box-shadow: -2px 0 15px rgba(0, 0, 0, 0.2);
       overflow-y: auto;
       padding: 20px;
       box-sizing: border-box;
-      color: white;
+      border-left: 2px solid #ddd;
     }
 
     .sidebar-header {
-      font-size: 24px;
+      font-size: 22px;
       font-weight: bold;
-      margin-bottom: 30px;
+      margin-bottom: 20px;
       text-align: center;
-      text-transform: uppercase;
-      letter-spacing: 1px;
+      color: #333;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #0066cc;
     }
 
     .money-display {
-      background: rgba(0, 0, 0, 0.3);
+      background: #f0f7ff;
       padding: 15px;
       border-radius: 8px;
-      margin-bottom: 20px;
+      margin-bottom: 25px;
       text-align: center;
-      border: 2px solid rgba(255, 255, 255, 0.5);
+      border: 2px solid #0066cc;
     }
 
     .money-label {
       font-size: 12px;
       text-transform: uppercase;
-      opacity: 0.8;
+      color: #666;
       margin-bottom: 5px;
+      font-weight: bold;
+      letter-spacing: 1px;
     }
 
     .money-amount {
-      font-size: 28px;
+      font-size: 32px;
       font-weight: bold;
-      color: #4ade80;
+      color: #0066cc;
     }
 
-    .button-group {
-      margin-top: 20px;
+    .buildings-section {
+      margin-top: 30px;
     }
 
-    .build-button {
-      width: 100%;
-      padding: 15px;
-      margin-bottom: 10px;
-      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-      color: white;
-      border: none;
-      border-radius: 8px;
+    .section-title {
       font-size: 16px;
       font-weight: bold;
-      cursor: pointer;
-      transition: all 0.3s ease;
+      color: #333;
+      margin-bottom: 15px;
       text-transform: uppercase;
       letter-spacing: 1px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      border-bottom: 2px solid #0066cc;
+      padding-bottom: 10px;
     }
 
-    .build-button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    .building-item {
+      background: #f9f9f9;
+      padding: 12px;
+      margin-bottom: 10px;
+      border-radius: 6px;
+      border-left: 4px solid #0066cc;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 1px solid #ddd;
     }
 
-    .build-button:active {
-      transform: translateY(0);
+    .building-item:hover {
+      background: #f0f7ff;
+      transform: translateX(-5px);
+      box-shadow: 0 2px 8px rgba(0, 102, 204, 0.15);
+    }
+
+    .building-item.unavailable {
+      opacity: 0.5;
+      cursor: not-allowed;
+      background: #f5f5f5;
+    }
+
+    .building-item.unavailable:hover {
+      background: #f5f5f5;
+      transform: none;
+    }
+
+    .building-name {
+      font-weight: bold;
+      font-size: 14px;
+      color: #333;
+    }
+
+    .building-cost {
+      background: #0066cc;
+      color: white;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+
+    .building-item.unavailable .building-cost {
+      background: #ccc;
+    }
+
+    .building-item.free {
+      border-left-color: #388e3c;
+    }
+
+    .building-item.free .building-cost {
+      background: #388e3c;
     }
 
     /* Modal Dialog */
     .modal {
       display: none;
       position: fixed;
-      z-index: 1000;
+      z-index: 2000;
       left: 0;
       top: 0;
       width: 100%;
       height: 100%;
-      background-color: rgba(0, 0, 0, 0.6);
+      background-color: rgba(0, 0, 0, 0.7);
     }
 
     .modal-content {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      margin: 5% auto;
+      background: white;
+      margin: 10% auto;
       padding: 30px;
-      border: 2px solid #f5576c;
+      border: 2px solid #0066cc;
       width: 90%;
-      max-width: 500px;
+      max-width: 400px;
       border-radius: 12px;
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-      color: white;
     }
 
     .modal-header {
-      font-size: 24px;
+      font-size: 20px;
       font-weight: bold;
       margin-bottom: 20px;
+      color: #333;
       text-align: center;
-      text-transform: uppercase;
-      border-bottom: 2px solid rgba(255, 255, 255, 0.3);
-      padding-bottom: 15px;
-    }
-
-    .building-list {
-      max-height: 400px;
-      overflow-y: auto;
-    }
-
-    .building-item {
-      background: rgba(0, 0, 0, 0.2);
-      padding: 15px;
-      margin-bottom: 12px;
-      border-radius: 8px;
-      border-left: 4px solid #4ade80;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .building-item:hover {
-      background: rgba(0, 0, 0, 0.4);
-      transform: translateX(5px);
-    }
-
-    .building-item.unavailable {
-      opacity: 0.5;
-      cursor: not-allowed;
-      border-left-color: #ef4444;
-    }
-
-    .building-name {
-      font-weight: bold;
-      font-size: 16px;
-    }
-
-    .building-cost {
-      background: rgba(255, 255, 255, 0.2);
-      padding: 5px 12px;
-      border-radius: 5px;
-      font-size: 14px;
-      white-space: nowrap;
     }
 
     .close {
@@ -182,16 +190,16 @@
       font-weight: bold;
       cursor: pointer;
       transition: color 0.3s ease;
+      line-height: 20px;
     }
 
-    .close:hover,
-    .close:focus {
-      color: white;
+    .close:hover {
+      color: #333;
     }
 
-    .insufficient-funds {
-      background: #ef4444;
-      color: white;
+    .success-message {
+      background: #d4edda;
+      color: #155724;
       padding: 12px;
       border-radius: 5px;
       margin-top: 10px;
@@ -200,178 +208,408 @@
       display: none;
     }
 
-    .insufficient-funds.show {
+    .success-message.show {
       display: block;
+    }
+
+    .instruction-text {
+      color: #666;
+      font-size: 12px;
+      text-align: center;
+      margin-top: 10px;
+      font-style: italic;
+    }
+
+    .logout-button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 20px;
+      background: #dc2626;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .logout-button:hover {
+      background: #b91c1c;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(220, 38, 38, 0.3);
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #0066cc;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #0052a3;
     }
   </style>
 </head>
 <body>
 
-  <div id="map"></div>
+  <div id="cesiumContainer"></div>
 
   <!-- Right Sidebar GUI -->
   <div id="sidebar">
-    <div class="sidebar-header">City Builder</div>
+    <div class="sidebar-header">Create Building</div>
     
     <div class="money-display">
       <div class="money-label">Your Budget</div>
-      <div class="money-amount" id="moneyDisplay">$200,000</div>
+      <div class="money-amount" id="moneyDisplay">$250,000</div>
     </div>
 
-    <div class="button-group">
-      <button class="build-button" id="buildButton">Build Building</button>
+    <div class="buildings-section">
+      <div class="section-title">Buildings:</div>
+      
+      <div class="building-item free" id="dispatchCentre">
+        <div class="building-name">Dispatch Centre</div>
+        <div class="building-cost">FREE</div>
+      </div>
+
+      <div class="building-item" id="policeStation">
+        <div class="building-name">Police Station</div>
+        <div class="building-cost">$100k</div>
+      </div>
+
+      <div class="building-item" id="fireStation">
+        <div class="building-name">Fire Station</div>
+        <div class="building-cost">$100k</div>
+      </div>
+
+      <div class="building-item" id="ambulanceStation">
+        <div class="building-name">Ambulance Station</div>
+        <div class="building-cost">$100k</div>
+      </div>
+
+      <div class="building-item" id="sesStation">
+        <div class="building-name">SES Station</div>
+        <div class="building-cost">$100k</div>
+      </div>
     </div>
+
+    <button class="logout-button" id="logoutButton">Logout</button>
   </div>
 
-  <!-- Building Selection Modal -->
-  <div id="buildingModal" class="modal">
+  <!-- Selection Modal -->
+  <div id="selectionModal" class="modal">
     <div class="modal-content">
       <span class="close" id="closeModal">&times;</span>
-      <div class="modal-header">Select a Building</div>
+      <div class="modal-header">Placing Building</div>
       
-      <div id="insufficientFunds" class="insufficient-funds">
-        Insufficient funds for this building!
+      <p id="modalMessage" style="color: #666; margin-bottom: 15px; text-align: center;">
+        Click on the map to place this building.
+      </p>
+
+      <div id="successMessage" class="success-message">
+        Building placed successfully!
       </div>
-      
-      <div class="building-list" id="buildingList">
-        <!-- Buildings will be populated here -->
+
+      <div class="instruction-text">
+        (Close this dialog to cancel)
       </div>
     </div>
   </div>
 
-  <!-- Leaflet JS -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
   <script>
+    // Initialize Cesium
+    Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJlY2Y0NjE2My04ZDYyLTRlMGQtOGE0Yy00ZmE3ZDU5MzBhMDYiLCJpZCI6MTQ3MzEwLCJpYXQiOjE2NzM0NTQ0OTJ9.1dV6U6kKkK6xAz7bPRwW5ZF-C4C5H3P7K4Z8p9X3A4M';
+
+    const viewer = new Cesium.Viewer('cesiumContainer', {
+      terrainProvider: Cesium.createWorldTerrain(),
+      imageryProvider: Cesium.ArcGisMapServerImageryProvider.fromUrl('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'),
+      useDefaultRenderLoop: true,
+      baseLayerPicker: false,
+      geocoder: false,
+      homeButton: false,
+      infoBox: false,
+      sceneModePicker: false,
+      selectionIndicator: false,
+      timeline: false,
+      navigationHelpButton: false,
+      fullscreenButton: false,
+      scene3DOnly: true
+    });
+
+    // Set initial view to globe
+    viewer.camera.setView({
+      destination: Cesium.Cartesian3.fromDegrees(133.7751, -25.2744, 15000000),
+    });
+
     // Game State
     const gameState = {
-      money: 200000,
-      selectedBuilding: null
+      money: 250000,
+      selectedBuilding: null,
+      selectedBuildingFree: false,
+      buildings: [],
+      placingBuilding: false,
+      dispatchCentreUsed: false
     };
 
     // Building Definitions
-    const buildings = [
-      { name: 'Small Police Station', cost: 50000, type: 'small-police' },
-      { name: 'Police Station', cost: 100000, type: 'police' },
-      { name: 'Small Fire Station', cost: 50000, type: 'small-fire' },
-      { name: 'Fire Station', cost: 100000, type: 'fire' },
-      { name: 'Small Ambulance Station', cost: 50000, type: 'small-ambulance' },
-      { name: 'Ambulance Station', cost: 100000, type: 'ambulance' }
-    ];
+    const buildingDefinitions = {
+      'dispatchCentre': { name: 'Dispatch Centre', cost: 0, color: Cesium.Color.YELLOW, icon: '📡' },
+      'policeStation': { name: 'Police Station', cost: 100000, color: Cesium.Color.BLUE, icon: '🚔' },
+      'fireStation': { name: 'Fire Station', cost: 100000, color: Cesium.Color.RED, icon: '🚒' },
+      'ambulanceStation': { name: 'Ambulance Station', cost: 100000, color: Cesium.Color.fromCssColorString('#06b6d4'), icon: '🚑' },
+      'sesStation': { name: 'SES Station', cost: 100000, color: Cesium.Color.fromCssColorString('#8b5cf6'), icon: '🛟' }
+    };
+
+    // Check if user is logged in
+    function checkLogin() {
+      const currentUser = localStorage.getItem('currentUser');
+      if (!currentUser) {
+        window.location.href = 'index.html';
+        return;
+      }
+      return currentUser;
+    }
+
+    // Load player data
+    function loadPlayerData(username) {
+      const playerDataKey = `playerData_${username}`;
+      const defaultData = {
+        money: 250000,
+        buildings: [],
+        dispatchCentreBuilt: false
+      };
+
+      const data = JSON.parse(localStorage.getItem(playerDataKey)) || defaultData;
+      gameState.money = data.money || 250000;
+      gameState.buildings = data.buildings || [];
+      gameState.dispatchCentreUsed = data.dispatchCentreBuilt || false;
+
+      return data;
+    }
+
+    // Save player data
+    function savePlayerData(username) {
+      const playerDataKey = `playerData_${username}`;
+      const data = {
+        money: gameState.money,
+        buildings: gameState.buildings,
+        dispatchCentreBuilt: gameState.dispatchCentreUsed
+      };
+      localStorage.setItem(playerDataKey, JSON.stringify(data));
+    }
 
     // Update money display
     function updateMoneyDisplay() {
       const moneyDisplay = document.getElementById('moneyDisplay');
       moneyDisplay.textContent = '$' + gameState.money.toLocaleString();
+      updateBuildingAvailability();
     }
 
-    // Create the map
-    const map = L.map('map').setView([20, 0], 2);
-
-    // Add OpenStreetMap tiles
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
-
-    // Build Button Click Handler
-    document.getElementById('buildButton').addEventListener('click', function() {
-      showBuildingModal();
-    });
-
-    // Show Building Selection Modal
-    function showBuildingModal() {
-      const modal = document.getElementById('buildingModal');
-      const buildingList = document.getElementById('buildingList');
-      const insufficientFunds = document.getElementById('insufficientFunds');
+    // Update building availability
+    function updateBuildingAvailability() {
+      const buildings = ['policeStation', 'fireStation', 'ambulanceStation', 'sesStation'];
       
-      buildingList.innerHTML = '';
-      insufficientFunds.classList.remove('show');
-
-      buildings.forEach(building => {
-        const canAfford = gameState.money >= building.cost;
-        const div = document.createElement('div');
-        div.className = 'building-item' + (canAfford ? '' : ' unavailable');
-        div.innerHTML = `
-          <div class="building-name">${building.name}</div>
-          <div class="building-cost">$${building.cost.toLocaleString()}</div>
-        `;
-
-        if (canAfford) {
-          div.addEventListener('click', function() {
-            selectBuilding(building);
-          });
+      buildings.forEach(buildingId => {
+        const element = document.getElementById(buildingId);
+        const cost = buildingDefinitions[buildingId].cost;
+        
+        if (gameState.money >= cost) {
+          element.classList.remove('unavailable');
         } else {
-          div.addEventListener('click', function() {
-            insufficientFunds.classList.add('show');
-          });
+          element.classList.add('unavailable');
         }
-
-        buildingList.appendChild(div);
       });
 
-      modal.style.display = 'block';
+      if (!gameState.dispatchCentreUsed) {
+        document.getElementById('dispatchCentre').classList.remove('unavailable');
+      } else {
+        document.getElementById('dispatchCentre').classList.add('unavailable');
+      }
     }
 
-    // Select a Building
-    function selectBuilding(building) {
-      gameState.selectedBuilding = building;
-      gameState.money -= building.cost;
-      updateMoneyDisplay();
+    // Add building to map
+    function addBuildingToMap(buildingType, position, latitude, longitude) {
+      const building = buildingDefinitions[buildingType];
+      
+      const entity = viewer.entities.add({
+        position: Cesium.Cartesian3.fromDegrees(longitude, latitude),
+        point: {
+          pixelSize: 10,
+          color: building.color,
+          outlineColor: Cesium.Color.WHITE,
+          outlineWidth: 2
+        },
+        properties: {
+          buildingType: buildingType,
+          buildingName: building.name
+        }
+      });
 
-      // Close modal
-      document.getElementById('buildingModal').style.display = 'none';
-
-      // Notify user and wait for map click
-      alert(`${building.name} selected! Click on the map to place it.`);
-      map.once('click', function(e) {
-        placeBuilding(building, e.latlng);
+      gameState.buildings.push({
+        type: buildingType,
+        name: building.name,
+        lat: latitude,
+        lng: longitude
       });
     }
 
-    // Place Building on Map
-    function placeBuilding(building, latlng) {
-      const colors = {
-        'small-police': '#3b82f6',
-        'police': '#1e40af',
-        'small-fire': '#f97316',
-        'fire': '#dc2626',
-        'small-ambulance': '#06b6d4',
-        'ambulance': '#0891b2'
-      };
-
-      const marker = L.circleMarker(latlng, {
-        radius: 15,
-        fillColor: colors[building.type],
-        color: '#000',
-        weight: 2,
-        opacity: 0.8,
-        fillOpacity: 0.7
-      }).addTo(map);
-
-      marker.bindPopup(`
-        <b>${building.name}</b><br>
-        Cost: $${building.cost.toLocaleString()}<br>
-        Coordinates: ${latlng.lat.toFixed(2)}, ${latlng.lng.toFixed(2)}
-      `);
-
-      marker.openPopup();
+    // Load buildings from save data
+    function loadBuildingsFromData() {
+      gameState.buildings.forEach(building => {
+        const entity = viewer.entities.add({
+          position: Cesium.Cartesian3.fromDegrees(building.lng, building.lat),
+          point: {
+            pixelSize: 10,
+            color: buildingDefinitions[building.type].color,
+            outlineColor: Cesium.Color.WHITE,
+            outlineWidth: 2
+          },
+          properties: {
+            buildingType: building.type,
+            buildingName: building.name
+          }
+        });
+      });
     }
 
-    // Modal Close Handler
-    document.getElementById('closeModal').addEventListener('click', function() {
-      document.getElementById('buildingModal').style.display = 'none';
+    // Initialize
+    const currentUser = checkLogin();
+    loadPlayerData(currentUser);
+    updateMoneyDisplay();
+    loadBuildingsFromData();
+
+    // Building click handlers
+    document.getElementById('dispatchCentre').addEventListener('click', function() {
+      if (gameState.dispatchCentreUsed) return;
+      
+      const element = this;
+      if (element.classList.contains('unavailable')) return;
+
+      gameState.selectedBuilding = 'dispatchCentre';
+      gameState.selectedBuildingFree = true;
+      gameState.dispatchCentreUsed = true;
+      showSelectionModal('Dispatch Centre (FREE)');
     });
 
-    // Close modal when clicking outside
-    window.addEventListener('click', function(event) {
-      const modal = document.getElementById('buildingModal');
-      if (event.target == modal) {
-        modal.style.display = 'none';
+    document.getElementById('policeStation').addEventListener('click', function() {
+      if (!this.classList.contains('unavailable')) {
+        gameState.selectedBuilding = 'policeStation';
+        gameState.selectedBuildingFree = false;
+        showSelectionModal('Police Station ($100,000)');
       }
     });
 
-    // Initialize
-    updateMoneyDisplay();
+    document.getElementById('fireStation').addEventListener('click', function() {
+      if (!this.classList.contains('unavailable')) {
+        gameState.selectedBuilding = 'fireStation';
+        gameState.selectedBuildingFree = false;
+        showSelectionModal('Fire Station ($100,000)');
+      }
+    });
+
+    document.getElementById('ambulanceStation').addEventListener('click', function() {
+      if (!this.classList.contains('unavailable')) {
+        gameState.selectedBuilding = 'ambulanceStation';
+        gameState.selectedBuildingFree = false;
+        showSelectionModal('Ambulance Station ($100,000)');
+      }
+    });
+
+    document.getElementById('sesStation').addEventListener('click', function() {
+      if (!this.classList.contains('unavailable')) {
+        gameState.selectedBuilding = 'sesStation';
+        gameState.selectedBuildingFree = false;
+        showSelectionModal('SES Station ($100,000)');
+      }
+    });
+
+    // Show selection modal
+    function showSelectionModal(buildingName) {
+      const modal = document.getElementById('selectionModal');
+      const message = document.getElementById('modalMessage');
+      message.textContent = `Click on the map to place ${buildingName}.`;
+      modal.style.display = 'block';
+      gameState.placingBuilding = true;
+    }
+
+    // Close modal
+    document.getElementById('closeModal').addEventListener('click', function() {
+      document.getElementById('selectionModal').style.display = 'none';
+      gameState.placingBuilding = false;
+      gameState.selectedBuilding = null;
+      
+      // Refund if not free
+      if (!gameState.selectedBuildingFree && gameState.selectedBuilding) {
+        const cost = buildingDefinitions[gameState.selectedBuilding].cost;
+        gameState.money += cost;
+      }
+      
+      // Reset dispatch centre flag if cancelled
+      if (gameState.selectedBuilding === 'dispatchCentre') {
+        gameState.dispatchCentreUsed = false;
+      }
+      
+      updateMoneyDisplay();
+    });
+
+    // Map click handler
+    const handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
+    handler.setInputAction(function(click) {
+      if (!gameState.placingBuilding || !gameState.selectedBuilding) return;
+
+      const pickedObject = viewer.scene.pick(click.position);
+      const cartesian = viewer.scene.pickPosition(click.position);
+
+      if (!Cesium.defined(cartesian)) return;
+
+      const cartographic = Cesium.Cartographic.fromCartesian(cartesian);
+      const latitude = Cesium.Math.toDegrees(cartographic.latitude);
+      const longitude = Cesium.Math.toDegrees(cartographic.longitude);
+
+      // Deduct money if not free
+      if (!gameState.selectedBuildingFree) {
+        const cost = buildingDefinitions[gameState.selectedBuilding].cost;
+        gameState.money -= cost;
+      }
+
+      // Add building to map
+      addBuildingToMap(gameState.selectedBuilding, cartesian, latitude, longitude);
+
+      // Save data
+      savePlayerData(currentUser);
+      updateMoneyDisplay();
+
+      // Show success
+      const successMsg = document.getElementById('successMessage');
+      successMsg.classList.add('show');
+
+      setTimeout(() => {
+        document.getElementById('selectionModal').style.display = 'none';
+        successMsg.classList.remove('show');
+        gameState.placingBuilding = false;
+        gameState.selectedBuilding = null;
+      }, 1500);
+    }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+    // Logout button
+    document.getElementById('logoutButton').addEventListener('click', function() {
+      localStorage.removeItem('currentUser');
+      window.location.href = 'index.html';
+    });
+
+    // Save data periodically
+    setInterval(() => {
+      savePlayerData(currentUser);
+    }, 30000);
   </script>
 
 </body>
