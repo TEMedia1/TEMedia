@@ -174,6 +174,8 @@
       max-width: 400px;
       border-radius: 12px;
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      max-height: 80vh;
+      overflow-y: auto;
     }
 
     .modal-header {
@@ -243,6 +245,58 @@
       box-shadow: 0 4px 8px rgba(220, 38, 38, 0.3);
     }
 
+    /* Station Info Styles */
+    .station-info {
+      color: #333;
+    }
+
+    .station-info h3 {
+      margin-top: 15px;
+      margin-bottom: 10px;
+      color: #0066cc;
+      font-size: 16px;
+    }
+
+    .vehicle-list {
+      background: #f0f7ff;
+      padding: 10px;
+      border-radius: 5px;
+      border-left: 4px solid #0066cc;
+    }
+
+    .vehicle-item {
+      padding: 5px 0;
+      font-size: 14px;
+      color: #333;
+    }
+
+    .call-item {
+      background: #fff3cd;
+      padding: 12px;
+      margin-bottom: 10px;
+      border-radius: 6px;
+      border-left: 4px solid #ffc107;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 1px solid #ffc107;
+    }
+
+    .call-item:hover {
+      background: #ffe69c;
+      transform: translateX(5px);
+    }
+
+    .call-type {
+      font-weight: bold;
+      color: #333;
+    }
+
+    .call-distance {
+      font-size: 12px;
+      color: #666;
+      margin-top: 5px;
+    }
+
     ::-webkit-scrollbar {
       width: 8px;
     }
@@ -258,6 +312,12 @@
 
     ::-webkit-scrollbar-thumb:hover {
       background: #0052a3;
+    }
+
+    .vehicle-responding {
+      font-size: 12px;
+      color: #155724;
+      margin-top: 5px;
     }
   </style>
 </head>
@@ -306,22 +366,34 @@
     <button class="logout-button" id="logoutButton">Logout</button>
   </div>
 
-  <!-- Selection Modal -->
-  <div id="selectionModal" class="modal">
+  <!-- Building Placement Modal -->
+  <div id="placementModal" class="modal">
     <div class="modal-content">
-      <span class="close" id="closeModal">&times;</span>
+      <span class="close" id="closePlacementModal">&times;</span>
       <div class="modal-header">Placing Building</div>
       
-      <p id="modalMessage" style="color: #666; margin-bottom: 15px; text-align: center;">
+      <p id="placementMessage" style="color: #666; margin-bottom: 15px; text-align: center;">
         Click on the map to place this building.
       </p>
 
-      <div id="successMessage" class="success-message">
+      <div id="placementSuccess" class="success-message">
         Building placed successfully!
       </div>
 
       <div class="instruction-text">
         (Close this dialog to cancel)
+      </div>
+    </div>
+  </div>
+
+  <!-- Station Info Modal -->
+  <div id="stationModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="closeStationModal">&times;</span>
+      <div class="modal-header" id="stationName">Station Info</div>
+      
+      <div id="stationContent" class="station-info">
+        <!-- Content populated dynamically -->
       </div>
     </div>
   </div>
@@ -341,19 +413,31 @@
       money: 250000,
       selectedBuilding: null,
       selectedBuildingFree: false,
-      buildings: [],
+      stations: [],
+      calls: [],
       placingBuilding: false,
-      dispatchCentreUsed: false
+      dispatchCentreUsed: false,
+      respondingVehicles: []
     };
 
     // Building Definitions
     const buildingDefinitions = {
-      'dispatchCentre': { name: 'Dispatch Centre', cost: 0, color: '#FFD700', icon: '📡' },
-      'policeStation': { name: 'Police Station', cost: 100000, color: '#3b82f6', icon: '🚔' },
-      'fireStation': { name: 'Fire Station', cost: 100000, color: '#dc2626', icon: '🚒' },
-      'ambulanceStation': { name: 'Ambulance Station', cost: 100000, color: '#06b6d4', icon: '🚑' },
-      'sesStation': { name: 'SES Station', cost: 100000, color: '#8b5cf6', icon: '🛟' }
+      'dispatchCentre': { name: 'Dispatch Centre', cost: 0, icon: '📡', vehicles: [] },
+      'policeStation': { name: 'Police Station', cost: 100000, icon: '🚔', vehicles: [{ type: 'Police Car', count: 1 }] },
+      'fireStation': { name: 'Fire Station', cost: 100000, icon: '🚒', vehicles: [{ type: 'Pumper', count: 1 }] },
+      'ambulanceStation': { name: 'Ambulance Station', cost: 100000, icon: '🚑', vehicles: [{ type: 'Ambulance', count: 1 }] },
+      'sesStation': { name: 'SES Station', cost: 100000, icon: '🛟', vehicles: [{ type: 'Rescue Truck', count: 1 }] }
     };
+
+    // Call Types
+    const callTypes = ['Car Fire', 'Fallen Person', 'Theft'];
+
+    // Helper function to convert lat/lng to pixel distance
+    function latLngToPixels(latlng1, latlng2) {
+      const point1 = map.latLngToContainerPoint(latlng1);
+      const point2 = map.latLngToContainerPoint(latlng2);
+      return point1.distanceTo(point2);
+    }
 
     // Check if user is logged in
     function checkLogin() {
@@ -370,13 +454,13 @@
       const playerDataKey = `playerData_${username}`;
       const defaultData = {
         money: 250000,
-        buildings: [],
+        stations: [],
         dispatchCentreBuilt: false
       };
 
       const data = JSON.parse(localStorage.getItem(playerDataKey)) || defaultData;
       gameState.money = data.money || 250000;
-      gameState.buildings = data.buildings || [];
+      gameState.stations = data.stations || [];
       gameState.dispatchCentreUsed = data.dispatchCentreBuilt || false;
 
       return data;
@@ -387,7 +471,7 @@
       const playerDataKey = `playerData_${username}`;
       const data = {
         money: gameState.money,
-        buildings: gameState.buildings,
+        stations: gameState.stations,
         dispatchCentreBuilt: gameState.dispatchCentreUsed
       };
       localStorage.setItem(playerDataKey, JSON.stringify(data));
@@ -422,58 +506,213 @@
       }
     }
 
-    // Add building to map
-    function addBuildingToMap(buildingType, latitude, longitude) {
-      const building = buildingDefinitions[buildingType];
-      
-      const marker = L.circleMarker([latitude, longitude], {
-        radius: 12,
-        fillColor: building.color,
-        color: '#fff',
-        weight: 2,
-        opacity: 0.8,
-        fillOpacity: 0.8
-      }).addTo(map);
-
-      marker.bindPopup(`
-        <b>${building.name}</b><br>
-        Cost: $${building.cost.toLocaleString()}<br>
-        Coordinates: ${latitude.toFixed(2)}, ${longitude.toFixed(2)}
-      `);
-
-      gameState.buildings.push({
-        type: buildingType,
-        name: building.name,
-        lat: latitude,
-        lng: longitude
+    // Create custom icon for station
+    function createStationIcon(buildingType) {
+      const icon = buildingDefinitions[buildingType].icon;
+      return L.divIcon({
+        html: `<div style="font-size: 32px; display: flex; justify-content: center; align-items: center; width: 40px; height: 40px;">${icon}</div>`,
+        iconSize: [40, 40],
+        className: 'station-icon'
       });
     }
 
-    // Load buildings from save data
-    function loadBuildingsFromData() {
-      gameState.buildings.forEach(building => {
-        const marker = L.circleMarker([building.lat, building.lng], {
-          radius: 12,
-          fillColor: buildingDefinitions[building.type].color,
-          color: '#fff',
-          weight: 2,
-          opacity: 0.8,
-          fillOpacity: 0.8
-        }).addTo(map);
+    // Add station to map
+    function addStationToMap(buildingType, latitude, longitude) {
+      const building = buildingDefinitions[buildingType];
+      
+      const station = {
+        id: Date.now(),
+        type: buildingType,
+        name: building.name,
+        lat: latitude,
+        lng: longitude,
+        vehicles: building.vehicles.map(v => ({ ...v })),
+        marker: null,
+        responseAreas: []
+      };
 
-        marker.bindPopup(`
-          <b>${building.name}</b><br>
-          Cost: $${buildingDefinitions[building.type].cost.toLocaleString()}<br>
-          Coordinates: ${building.lat.toFixed(2)}, ${building.lng.toFixed(2)}
-        `);
+      const marker = L.marker([latitude, longitude], {
+        icon: createStationIcon(buildingType)
+      }).addTo(map);
+
+      marker.on('click', function() {
+        showStationInfo(station);
       });
+
+      station.marker = marker;
+      gameState.stations.push(station);
+
+      // Draw response area (100px circle)
+      const radiusInMeters = 100 / (map.getZoom() * 10);
+      const circle = L.circle([latitude, longitude], {
+        radius: radiusInMeters,
+        color: '#0066cc',
+        fillColor: '#0066cc',
+        fillOpacity: 0.1,
+        weight: 2,
+        dashArray: '5, 5'
+      }).addTo(map);
+
+      station.responseAreas.push(circle);
+
+      return station;
+    }
+
+    // Show station info
+    function showStationInfo(station) {
+      const modal = document.getElementById('stationModal');
+      const stationName = document.getElementById('stationName');
+      const stationContent = document.getElementById('stationContent');
+
+      stationName.textContent = station.name;
+      
+      let html = `<h3>Vehicles:</h3><div class="vehicle-list">`;
+      station.vehicles.forEach(vehicle => {
+        html += `<div class="vehicle-item">• ${vehicle.type} (${vehicle.count})</div>`;
+      });
+      html += `</div>`;
+
+      // Get nearby calls
+      const nearbyCalls = gameState.calls.filter(call => {
+        const distance = latLngToPixels(station.marker.getLatLng(), L.latLng(call.lat, call.lng));
+        return distance <= 100;
+      });
+
+      if (nearbyCalls.length > 0) {
+        html += `<h3>Nearby Calls (within range):</h3>`;
+        nearbyCalls.forEach(call => {
+          html += `
+            <div class="call-item" onclick="respondToCall(${call.id}, ${station.id})">
+              <div class="call-type">${call.type}</div>
+              <div class="call-distance">Distance: ${latLngToPixels(station.marker.getLatLng(), L.latLng(call.lat, call.lng)).toFixed(0)}px</div>
+            </div>
+          `;
+        });
+      }
+
+      stationContent.innerHTML = html;
+      modal.style.display = 'block';
+    }
+
+    // Respond to call
+    function respondToCall(callId, stationId) {
+      const call = gameState.calls.find(c => c.id === callId);
+      const station = gameState.stations.find(s => s.id === stationId);
+
+      if (!call || !station) return;
+
+      // Get vehicle to respond
+      let respondingVehicle = null;
+      if (station.type === 'fireStation') {
+        respondingVehicle = { icon: '🚒', name: 'Pumper' };
+      } else if (station.type === 'policeStation') {
+        respondingVehicle = { icon: '🚔', name: 'Police Car' };
+      } else if (station.type === 'ambulanceStation') {
+        respondingVehicle = { icon: '🚑', name: 'Ambulance' };
+      } else if (station.type === 'sesStation') {
+        respondingVehicle = { icon: '🛟', name: 'Rescue Truck' };
+      }
+
+      if (!respondingVehicle) return;
+
+      // Draw line from station to call
+      const lineLayer = L.polyline([
+        [station.lat, station.lng],
+        [call.lat, call.lng]
+      ], {
+        color: '#dc2626',
+        weight: 3,
+        opacity: 0.8,
+        dashArray: '5, 5'
+      }).addTo(map);
+
+      // Animate vehicle
+      const vehicleMarker = L.marker([station.lat, station.lng], {
+        icon: L.divIcon({
+          html: `<div style="font-size: 24px;">${respondingVehicle.icon}</div>`,
+          iconSize: [30, 30],
+          className: 'responding-vehicle'
+        })
+      }).addTo(map);
+
+      // Animate movement
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += 0.02;
+        if (progress >= 1) {
+          clearInterval(interval);
+          vehicleMarker.remove();
+          lineLayer.remove();
+          
+          // Remove call
+          gameState.calls = gameState.calls.filter(c => c.id !== callId);
+          
+          // Close modal
+          document.getElementById('stationModal').style.display = 'none';
+          
+          return;
+        }
+
+        const currentLat = station.lat + (call.lat - station.lat) * progress;
+        const currentLng = station.lng + (call.lng - station.lng) * progress;
+        vehicleMarker.setLatLng([currentLat, currentLng]);
+      }, 50);
+
+      gameState.respondingVehicles.push({
+        id: Date.now(),
+        vehicleMarker,
+        lineLayer,
+        interval,
+        callId
+      });
+    }
+
+    // Generate random call
+    function generateRandomCall() {
+      if (gameState.stations.length === 0) return;
+
+      const station = gameState.stations[Math.floor(Math.random() * gameState.stations.length)];
+      const callType = callTypes[Math.floor(Math.random() * callTypes.length)];
+      
+      // Generate call within 100px of station
+      const point = map.latLngToContainerPoint([station.lat, station.lng]);
+      const angle = Math.random() * Math.PI * 2;
+      const distance = Math.random() * 100;
+      const newPoint = L.point(
+        point.x + Math.cos(angle) * distance,
+        point.y + Math.sin(angle) * distance
+      );
+      const latlng = map.containerPointToLatLng(newPoint);
+
+      const call = {
+        id: Date.now(),
+        type: callType,
+        lat: latlng.lat,
+        lng: latlng.lng,
+        marker: L.marker([latlng.lat, latlng.lng], {
+          icon: L.divIcon({
+            html: `<div style="font-size: 24px; color: #dc2626;">📍</div>`,
+            iconSize: [30, 30],
+            className: 'call-marker'
+          })
+        }).bindPopup(`<b>${callType}</b>`).addTo(map)
+      };
+
+      gameState.calls.push(call);
     }
 
     // Initialize
     const currentUser = checkLogin();
     loadPlayerData(currentUser);
     updateMoneyDisplay();
-    loadBuildingsFromData();
+
+    // Load stations from saved data
+    gameState.stations.forEach(station => {
+      // Rebuild stations
+      const newStation = addStationToMap(station.type, station.lat, station.lng);
+      // Restore vehicles
+      newStation.vehicles = station.vehicles;
+    });
 
     // Building click handlers
     document.getElementById('dispatchCentre').addEventListener('click', function() {
@@ -485,14 +724,14 @@
       gameState.selectedBuilding = 'dispatchCentre';
       gameState.selectedBuildingFree = true;
       gameState.dispatchCentreUsed = true;
-      showSelectionModal('Dispatch Centre (FREE)');
+      showPlacementModal('Dispatch Centre (FREE)');
     });
 
     document.getElementById('policeStation').addEventListener('click', function() {
       if (!this.classList.contains('unavailable')) {
         gameState.selectedBuilding = 'policeStation';
         gameState.selectedBuildingFree = false;
-        showSelectionModal('Police Station ($100,000)');
+        showPlacementModal('Police Station ($100,000)');
       }
     });
 
@@ -500,7 +739,7 @@
       if (!this.classList.contains('unavailable')) {
         gameState.selectedBuilding = 'fireStation';
         gameState.selectedBuildingFree = false;
-        showSelectionModal('Fire Station ($100,000)');
+        showPlacementModal('Fire Station ($100,000)');
       }
     });
 
@@ -508,7 +747,7 @@
       if (!this.classList.contains('unavailable')) {
         gameState.selectedBuilding = 'ambulanceStation';
         gameState.selectedBuildingFree = false;
-        showSelectionModal('Ambulance Station ($100,000)');
+        showPlacementModal('Ambulance Station ($100,000)');
       }
     });
 
@@ -516,22 +755,22 @@
       if (!this.classList.contains('unavailable')) {
         gameState.selectedBuilding = 'sesStation';
         gameState.selectedBuildingFree = false;
-        showSelectionModal('SES Station ($100,000)');
+        showPlacementModal('SES Station ($100,000)');
       }
     });
 
-    // Show selection modal
-    function showSelectionModal(buildingName) {
-      const modal = document.getElementById('selectionModal');
-      const message = document.getElementById('modalMessage');
+    // Show placement modal
+    function showPlacementModal(buildingName) {
+      const modal = document.getElementById('placementModal');
+      const message = document.getElementById('placementMessage');
       message.textContent = `Click on the map to place ${buildingName}.`;
       modal.style.display = 'block';
       gameState.placingBuilding = true;
     }
 
-    // Close modal
-    document.getElementById('closeModal').addEventListener('click', function() {
-      document.getElementById('selectionModal').style.display = 'none';
+    // Close placement modal
+    document.getElementById('closePlacementModal').addEventListener('click', function() {
+      document.getElementById('placementModal').style.display = 'none';
       gameState.placingBuilding = false;
       gameState.selectedBuilding = null;
       
@@ -549,7 +788,12 @@
       updateMoneyDisplay();
     });
 
-    // Map click handler
+    // Close station modal
+    document.getElementById('closeStationModal').addEventListener('click', function() {
+      document.getElementById('stationModal').style.display = 'none';
+    });
+
+    // Map click handler for building placement
     map.on('click', function(e) {
       if (!gameState.placingBuilding || !gameState.selectedBuilding) return;
 
@@ -562,19 +806,19 @@
         gameState.money -= cost;
       }
 
-      // Add building to map
-      addBuildingToMap(gameState.selectedBuilding, latitude, longitude);
+      // Add station to map
+      addStationToMap(gameState.selectedBuilding, latitude, longitude);
 
       // Save data
       savePlayerData(currentUser);
       updateMoneyDisplay();
 
       // Show success
-      const successMsg = document.getElementById('successMessage');
+      const successMsg = document.getElementById('placementSuccess');
       successMsg.classList.add('show');
 
       setTimeout(() => {
-        document.getElementById('selectionModal').style.display = 'none';
+        document.getElementById('placementModal').style.display = 'none';
         successMsg.classList.remove('show');
         gameState.placingBuilding = false;
         gameState.selectedBuilding = null;
@@ -583,24 +827,28 @@
 
     // Close modal when clicking outside
     window.addEventListener('click', function(event) {
-      const modal = document.getElementById('selectionModal');
-      if (event.target == modal) {
-        modal.style.display = 'none';
+      const placementModal = document.getElementById('placementModal');
+      const stationModal = document.getElementById('stationModal');
+      
+      if (event.target == placementModal) {
+        placementModal.style.display = 'none';
         gameState.placingBuilding = false;
         gameState.selectedBuilding = null;
         
-        // Refund if not free
         if (!gameState.selectedBuildingFree && gameState.selectedBuilding) {
           const cost = buildingDefinitions[gameState.selectedBuilding].cost;
           gameState.money += cost;
         }
         
-        // Reset dispatch centre flag if cancelled
         if (gameState.selectedBuilding === 'dispatchCentre') {
           gameState.dispatchCentreUsed = false;
         }
         
         updateMoneyDisplay();
+      }
+
+      if (event.target == stationModal) {
+        stationModal.style.display = 'none';
       }
     });
 
@@ -614,6 +862,13 @@
     setInterval(() => {
       savePlayerData(currentUser);
     }, 30000);
+
+    // Generate random calls every 10 seconds
+    setInterval(() => {
+      if (gameState.stations.length > 0 && Math.random() > 0.7) {
+        generateRandomCall();
+      }
+    }, 10000);
   </script>
 
 </body>
