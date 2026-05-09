@@ -24,7 +24,7 @@
     }
 
     #mapContainer {
-      width: calc(100% - 350px);
+      width: 100%;
       height: 100vh;
       position: relative;
     }
@@ -366,26 +366,6 @@
     <button class="logout-button" id="logoutButton">Logout</button>
   </div>
 
-  <!-- Building Placement Modal -->
-  <div id="placementModal" class="modal">
-    <div class="modal-content">
-      <span class="close" id="closePlacementModal">&times;</span>
-      <div class="modal-header">Placing Building</div>
-      
-      <p id="placementMessage" style="color: #666; margin-bottom: 15px; text-align: center;">
-        Click on the map to place this building.
-      </p>
-
-      <div id="placementSuccess" class="success-message">
-        Building placed successfully!
-      </div>
-
-      <div class="instruction-text">
-        (Close this dialog to cancel)
-      </div>
-    </div>
-  </div>
-
   <!-- Station Info Modal -->
   <div id="stationModal" class="modal">
     <div class="modal-content">
@@ -725,15 +705,14 @@
 
       gameState.selectedBuilding = 'dispatchCentre';
       gameState.selectedBuildingFree = true;
-      gameState.dispatchCentreUsed = true;
-      showPlacementModal('Dispatch Centre (FREE)');
+      gameState.placingBuilding = true;
     });
 
     document.getElementById('policeStation').addEventListener('click', function() {
       if (!this.classList.contains('unavailable')) {
         gameState.selectedBuilding = 'policeStation';
         gameState.selectedBuildingFree = false;
-        showPlacementModal('Police Station ($100,000)');
+        gameState.placingBuilding = true;
       }
     });
 
@@ -741,7 +720,7 @@
       if (!this.classList.contains('unavailable')) {
         gameState.selectedBuilding = 'fireStation';
         gameState.selectedBuildingFree = false;
-        showPlacementModal('Fire Station ($100,000)');
+        gameState.placingBuilding = true;
       }
     });
 
@@ -749,7 +728,7 @@
       if (!this.classList.contains('unavailable')) {
         gameState.selectedBuilding = 'ambulanceStation';
         gameState.selectedBuildingFree = false;
-        showPlacementModal('Ambulance Station ($100,000)');
+        gameState.placingBuilding = true;
       }
     });
 
@@ -757,41 +736,8 @@
       if (!this.classList.contains('unavailable')) {
         gameState.selectedBuilding = 'sesStation';
         gameState.selectedBuildingFree = false;
-        showPlacementModal('SES Station ($100,000)');
+        gameState.placingBuilding = true;
       }
-    });
-
-    // Show placement modal
-    function showPlacementModal(buildingName) {
-      const modal = document.getElementById('placementModal');
-      const message = document.getElementById('placementMessage');
-      message.textContent = `Click on the map to place ${buildingName}.`;
-      modal.style.display = 'block';
-      gameState.placingBuilding = true;
-    }
-
-    // Close placement modal
-    document.getElementById('closePlacementModal').addEventListener('click', function() {
-      // Save selected building type before resetting
-      const cancelledBuilding = gameState.selectedBuilding;
-      const wasFree = gameState.selectedBuildingFree;
-      
-      document.getElementById('placementModal').style.display = 'none';
-      gameState.placingBuilding = false;
-      gameState.selectedBuilding = null;
-      
-      // Refund if not free
-      if (!wasFree && cancelledBuilding) {
-        const cost = buildingDefinitions[cancelledBuilding].cost;
-        gameState.money += cost;
-      }
-      
-      // Reset dispatch centre flag if cancelled
-      if (cancelledBuilding === 'dispatchCentre') {
-        gameState.dispatchCentreUsed = false;
-      }
-      
-      updateMoneyDisplay();
     });
 
     // Close station modal
@@ -806,59 +752,50 @@
       const latitude = e.latlng.lat;
       const longitude = e.latlng.lng;
 
+      // Store building info before placement
+      const buildingType = gameState.selectedBuilding;
+      const wasFree = gameState.selectedBuildingFree;
+
       // Deduct money if not free
-      if (!gameState.selectedBuildingFree) {
-        const cost = buildingDefinitions[gameState.selectedBuilding].cost;
+      if (!wasFree) {
+        const cost = buildingDefinitions[buildingType].cost;
         gameState.money -= cost;
       }
 
       // Add station to map
-      addStationToMap(gameState.selectedBuilding, latitude, longitude);
+      addStationToMap(buildingType, latitude, longitude);
+
+      // Mark dispatch centre as used if applicable
+      if (buildingType === 'dispatchCentre') {
+        gameState.dispatchCentreUsed = true;
+      }
 
       // Save data
       savePlayerData(currentUser);
       updateMoneyDisplay();
 
-      // Show success
-      const successMsg = document.getElementById('placementSuccess');
-      successMsg.classList.add('show');
-
-      setTimeout(() => {
-        document.getElementById('placementModal').style.display = 'none';
-        successMsg.classList.remove('show');
-        gameState.placingBuilding = false;
-        gameState.selectedBuilding = null;
-      }, 1500);
+      // Reset placement mode
+      gameState.placingBuilding = false;
+      gameState.selectedBuilding = null;
     });
 
-    // Close modal when clicking outside
-    window.addEventListener('click', function(event) {
-      const placementModal = document.getElementById('placementModal');
-      const stationModal = document.getElementById('stationModal');
-      
-      if (event.target == placementModal) {
-        // Save selected building type before resetting
-        const cancelledBuilding = gameState.selectedBuilding;
-        const wasFree = gameState.selectedBuildingFree;
-        
-        placementModal.style.display = 'none';
-        gameState.placingBuilding = false;
-        gameState.selectedBuilding = null;
-        
-        if (!wasFree && cancelledBuilding) {
-          const cost = buildingDefinitions[cancelledBuilding].cost;
+    // Escape key to cancel building placement
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape' && gameState.placingBuilding) {
+        // Refund money if applicable
+        if (!gameState.selectedBuildingFree && gameState.selectedBuilding) {
+          const cost = buildingDefinitions[gameState.selectedBuilding].cost;
           gameState.money += cost;
         }
-        
-        if (cancelledBuilding === 'dispatchCentre') {
+
+        // Reset dispatch centre flag if cancelled
+        if (gameState.selectedBuilding === 'dispatchCentre') {
           gameState.dispatchCentreUsed = false;
         }
-        
-        updateMoneyDisplay();
-      }
 
-      if (event.target == stationModal) {
-        stationModal.style.display = 'none';
+        gameState.placingBuilding = false;
+        gameState.selectedBuilding = null;
+        updateMoneyDisplay();
       }
     });
 
