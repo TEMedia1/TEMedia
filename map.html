@@ -707,7 +707,9 @@
     updateMoneyDisplay();
 
     // Load stations from saved data
-    gameState.stations.forEach(station => {
+    const savedStations = gameState.stations.slice();
+    gameState.stations = [];
+    savedStations.forEach(station => {
       // Rebuild stations
       const newStation = addStationToMap(station.type, station.lat, station.lng);
       // Restore vehicles
@@ -770,18 +772,22 @@
 
     // Close placement modal
     document.getElementById('closePlacementModal').addEventListener('click', function() {
+      // Save selected building type before resetting
+      const cancelledBuilding = gameState.selectedBuilding;
+      const wasFree = gameState.selectedBuildingFree;
+      
       document.getElementById('placementModal').style.display = 'none';
       gameState.placingBuilding = false;
       gameState.selectedBuilding = null;
       
       // Refund if not free
-      if (!gameState.selectedBuildingFree && gameState.selectedBuilding) {
-        const cost = buildingDefinitions[gameState.selectedBuilding].cost;
+      if (!wasFree && cancelledBuilding) {
+        const cost = buildingDefinitions[cancelledBuilding].cost;
         gameState.money += cost;
       }
       
       // Reset dispatch centre flag if cancelled
-      if (gameState.selectedBuilding === 'dispatchCentre') {
+      if (cancelledBuilding === 'dispatchCentre') {
         gameState.dispatchCentreUsed = false;
       }
       
@@ -831,16 +837,20 @@
       const stationModal = document.getElementById('stationModal');
       
       if (event.target == placementModal) {
+        // Save selected building type before resetting
+        const cancelledBuilding = gameState.selectedBuilding;
+        const wasFree = gameState.selectedBuildingFree;
+        
         placementModal.style.display = 'none';
         gameState.placingBuilding = false;
         gameState.selectedBuilding = null;
         
-        if (!gameState.selectedBuildingFree && gameState.selectedBuilding) {
-          const cost = buildingDefinitions[gameState.selectedBuilding].cost;
+        if (!wasFree && cancelledBuilding) {
+          const cost = buildingDefinitions[cancelledBuilding].cost;
           gameState.money += cost;
         }
         
-        if (gameState.selectedBuilding === 'dispatchCentre') {
+        if (cancelledBuilding === 'dispatchCentre') {
           gameState.dispatchCentreUsed = false;
         }
         
