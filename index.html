@@ -17,14 +17,78 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background: white;
+            background: #000;
             overflow: hidden;
+            position: relative;
+        }
+
+        /* GTA-style flashing background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #ff0000, #0000ff, #ff0000, #0000ff);
+            background-size: 400% 400%;
+            opacity: 0.3;
+            animation: policeFlash 0.5s infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        @keyframes policeFlash {
+            0% {
+                background-position: 0% 50%;
+                opacity: 0.3;
+            }
+            50% {
+                background-position: 100% 50%;
+                opacity: 0.6;
+            }
+            100% {
+                background-position: 0% 50%;
+                opacity: 0.3;
+            }
+        }
+
+        /* Red light overlay */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 50%, rgba(255, 0, 0, 0.4), transparent 40%),
+                        radial-gradient(circle at 80% 50%, rgba(0, 0, 255, 0.4), transparent 40%);
+            animation: sirenLights 0.5s infinite;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        @keyframes sirenLights {
+            0%, 100% {
+                background: radial-gradient(circle at 20% 50%, rgba(255, 0, 0, 0.4), transparent 40%),
+                            radial-gradient(circle at 80% 50%, rgba(0, 0, 255, 0.1), transparent 40%);
+            }
+            50% {
+                background: radial-gradient(circle at 20% 50%, rgba(255, 0, 0, 0.1), transparent 40%),
+                            radial-gradient(circle at 80% 50%, rgba(0, 0, 255, 0.4), transparent 40%);
+            }
         }
 
         .container {
             text-align: center;
             max-width: 500px;
             width: 90%;
+            position: relative;
+            z-index: 3;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
         }
 
         .header {
@@ -134,6 +198,11 @@
     </style>
 </head>
 <body>
+    <!-- Audio element for siren sound -->
+    <audio id="sirenSound" loop>
+        <source src="data:audio/wav;base64,UklGRiYAAABXQVZFZm10IBAAAAABAAEAQB8AAAB9AAACABAAZGF0YQIAAAAAAA==" type="audio/wav">
+    </audio>
+
     <div class="container">
         <div class="header">
             <h1 class="game-title">Australian Emergency Response</h1>
@@ -179,6 +248,41 @@
     </div>
 
     <script>
+        // Generate siren sound using Web Audio API
+        function generateSirenSound() {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            // Set initial frequency and fade volume
+            oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+            gainNode.gain.setValueAtTime(0.05, audioContext.currentTime); // Very faint
+            
+            // Siren pitch modulation
+            oscillator.frequency.exponentialRampToValueAtTime(1200, audioContext.currentTime + 0.5);
+            oscillator.frequency.exponentialRampToValueAtTime(800, audioContext.currentTime + 1);
+            
+            oscillator.start();
+            oscillator.stop(audioContext.currentTime + 1);
+        }
+
+        // Play siren on loop
+        function startSiren() {
+            setInterval(() => {
+                try {
+                    generateSirenSound();
+                } catch (e) {
+                    console.log('Siren audio not available');
+                }
+            }, 1000);
+        }
+
+        // Start siren when page loads
+        window.addEventListener('load', startSiren);
+
         // Login form handler
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
