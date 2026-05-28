@@ -7,20 +7,25 @@
 <title>Tasmanian Emergency Media</title>
 
 <style>
-
 body{
     font-family:Arial,sans-serif;
     margin:40px;
+    background:#111;
+    color:white;
 }
 
 .post{
     max-width:800px;
     margin:auto;
+    background:#222;
+    padding:20px;
+    border-radius:10px;
 }
 
 img{
     max-width:100%;
     margin-top:20px;
+    display:none;
 }
 
 .floating-btn{
@@ -41,9 +46,11 @@ img{
     bottom:90px;
     right:20px;
     background:white;
+    color:black;
     border:1px solid black;
     padding:20px;
     width:300px;
+    border-radius:10px;
 }
 
 .admin input,
@@ -58,46 +65,32 @@ img{
     padding:10px;
     cursor:pointer;
 }
-
 </style>
 </head>
 
 <body>
 
 <div class="post">
-
-<h1 id="title">Latest Media</h1>
-
-<p id="desc">No updates yet.</p>
-
+<h1 id="title">Loading...</h1>
+<p id="desc">Waiting for updates...</p>
 <img id="image">
-
 </div>
 
 <button class="floating-btn" onclick="openAdmin()">+</button>
 
 <div class="admin" id="adminPanel">
-
 <input type="password" id="password" placeholder="Password">
-
 <button onclick="login()">Login</button>
 
 <div id="editor" style="display:none;">
-
 <input type="text" id="newTitle" placeholder="Title">
-
 <textarea id="newDesc" placeholder="Description"></textarea>
-
-<input type="text" id="newImage" placeholder="Image URL">
-
+<input type="text" id="newImage" placeholder="Image URL (optional)">
 <button onclick="updatePost()">Post</button>
-
 </div>
-
 </div>
 
 <script type="module">
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
 getFirestore,
@@ -107,12 +100,12 @@ onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBQ-dRGRRLNE0YmuKov05mY54oWCSzp3zY",
-  authDomain: "temedia1000.firebaseapp.com",
-  projectId: "temedia1000",
-  storageBucket: "temedia1000.firebasestorage.app",
-  messagingSenderId: "534982245676",
-  appId: "1:534982245676:web:a4fdc146c2adf843e08089"
+  apiKey: "AIzaSyAIqLic00FcNgtuKZATMdHU4jRITnYO2A8",
+  authDomain: "temedia20-be031.firebaseapp.com",
+  projectId: "temedia20-be031",
+  storageBucket: "temedia20-be031.firebasestorage.app",
+  messagingSenderId: "514394139848",
+  appId: "1:514394139848:web:7edabb080c12b87bc909fd"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -120,10 +113,9 @@ const db = getFirestore(app);
 
 const docRef = doc(db, "posts", "latest");
 
+// LIVE UPDATES
 onSnapshot(docRef, (docSnap) => {
-
     if(docSnap.exists()){
-
         const data = docSnap.data();
 
         document.getElementById("title").innerText =
@@ -132,19 +124,23 @@ onSnapshot(docRef, (docSnap) => {
         document.getElementById("desc").innerText =
         data.desc || "";
 
-        document.getElementById("image").src =
-        data.image || "";
+        const img = document.getElementById("image");
 
+        if(data.image){
+            img.src = data.image;
+            img.style.display = "block";
+        } else {
+            img.style.display = "none";
+        }
     }
-
 });
 
+// UI functions
 window.openAdmin = function(){
     document.getElementById("adminPanel").style.display = "block";
 }
 
 window.login = function(){
-
     let pass = document.getElementById("password").value;
 
     let secret = ["G","H","5","5","3","2"].join("");
@@ -154,23 +150,25 @@ window.login = function(){
     } else {
         alert("Wrong password");
     }
-
 }
 
 window.updatePost = async function(){
-
     let title = document.getElementById("newTitle").value;
     let desc = document.getElementById("newDesc").value;
     let image = document.getElementById("newImage").value;
 
     await setDoc(docRef, {
-        title,
-        desc,
-        image
+        title: title,
+        desc: desc,
+        image: image
     });
 
-}
+    alert("Posted!");
 
+    document.getElementById("newTitle").value = "";
+    document.getElementById("newDesc").value = "";
+    document.getElementById("newImage").value = "";
+}
 </script>
 
 </body>
