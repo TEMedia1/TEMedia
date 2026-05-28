@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TEM Store (Private)</title>
+
+<style>
+body{
+    font-family:Arial;
+    background:#111;
+    color:white;
+    text-align:center;
+    padding-top:100px;
+}
+
+.store{
+    display:none;
+    max-width:900px;
+    margin:auto;
+}
+
+.item{
+    background:#222;
+    padding:15px;
+    margin:10px;
+    border-radius:10px;
+}
+
+button{
+    padding:10px;
+    background:red;
+    color:white;
+    border:none;
+    cursor:pointer;
+}
+
+input{
+    padding:10px;
+    margin:5px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>TEM Store Access</h2>
+
+<div id="loginBox">
+<input type="password" id="pass" placeholder="Enter password">
+<br>
+<button onclick="login()">Enter Store</button>
+</div>
+
+<div class="store" id="store">
+
+<h2>Store Items</h2>
+
+<div class="item">
+<h3>Emergency Media Sticker Pack</h3>
+<p>$5.00</p>
+<button onclick="buy('Sticker Pack')">Select</button>
+</div>
+
+<div class="item">
+<h3>Fire Scene Photo Pack</h3>
+<p>$10.00</p>
+<button onclick="buy('Photo Pack')">Select</button>
+</div>
+
+<div class="item">
+<h3>TEM Support Donation</h3>
+<p>Support project</p>
+<button onclick="buy('Donation')">Select</button>
+</div>
+
+</div>
+
+<script>
+const secret = "TEMSTORE123"; // change this anytime
+
+function login(){
+    const p = document.getElementById("pass").value;
+
+    if(p === secret){
+        document.getElementById("loginBox").style.display = "none";
+        document.getElementById("store").style.display = "block";
+    } else {
+        alert("Wrong password");
+    }
+}
+
+function buy(item){
+    alert("Selected: " + item + " (checkout coming later)");
+}
+</script>
+
+</body>
+</html>
