@@ -53,58 +53,40 @@ button{
 <h1>TEM Store</h1>
 </header>
 
-<div class="store" id="store"></div>
+<div class="store">
 
-<script type="module">
+<!-- TEM STICKER PRODUCT -->
+<div class="item">
+<h2>TEM Sticker</h2>
+<p>Official Tasmanian Emergency Media sticker</p>
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {
-getFirestore,
-collection,
-onSnapshot,
-query,
-orderBy
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+<p class="price">
+$5.00 + $1.70 postage
+</p>
 
-const firebaseConfig = {
-  apiKey: "AIzaSyAIqLic00FcNgtuKZATMdHU4jRITnYO2A8",
-  authDomain: "temedia20-be031.firebaseapp.com",
-  projectId: "temedia20-be031",
-  storageBucket: "temedia20-be031.firebasestorage.app",
-  messagingSenderId: "514394139848",
-  appId: "1:514394139848:web:7edabb080c12b87bc909fd"
-};
+<button onclick="buySticker()">Buy Now</button>
+</div>
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+</div>
 
-const storeDiv = document.getElementById("store");
+<script>
+function buySticker(){
 
-/* LIVE STORE ITEMS */
-const q = query(collection(db,"store"), orderBy("time","desc"));
+    const item = "TEM Sticker";
+    const price = 5.00;
+    const postage = 1.70;
+    const total = (price + postage).toFixed(2);
 
-onSnapshot(q,(snap)=>{
-    storeDiv.innerHTML = "";
+    alert(
+        "ITEM: " + item +
+        "\nPRICE: $" + price +
+        "\nPOSTAGE: $" + postage +
+        "\nTOTAL: $" + total +
+        "\n\nCheckout system not enabled yet."
+    );
 
-    snap.forEach((doc)=>{
-        const d = doc.data();
-
-        storeDiv.innerHTML += `
-        <div class="item">
-            <h2>${d.name}</h2>
-            <p>${d.desc}</p>
-            <p class="price">$${d.price || "0.00"}</p>
-
-            <button onclick="buy('${d.name}')">Buy</button>
-        </div>
-        `;
-    });
-});
-
-window.buy = function(item){
-    alert("Selected: " + item + " (checkout not enabled yet)");
+    // READY FOR STRIPE UPGRADE LATER
 }
-
 </script>
 
 </body>
