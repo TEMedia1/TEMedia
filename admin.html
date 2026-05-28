@@ -1,1 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Admin Upload</title>
+</head>
 
+<body>
+
+<h2>Post Update</h2>
+
+<input id="title" placeholder="Title"><br><br>
+<textarea id="desc" placeholder="Description"></textarea><br><br>
+
+<input type="file" id="image"><br><br>
+
+<button onclick="uploadPost()">Upload</button>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+getFirestore,
+doc,
+setDoc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+import {
+getStorage,
+ref,
+uploadBytes,
+getDownloadURL
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAIqLic00FcNgtuKZATMdHU4jRITnYO2A8",
+  authDomain: "temedia20-be031.firebaseapp.com",
+  projectId: "temedia20-be031",
+  storageBucket: "temedia20-be031.firebasestorage.app",
+  messagingSenderId: "514394139848",
+  appId: "1:514394139848:web:7edabb080c12b87bc909fd"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const storage = getStorage(app);
+
+const docRef = doc(db, "posts", "latest");
+
+window.uploadPost = async function(){
+
+    const title = document.getElementById("title").value;
+    const desc = document.getElementById("desc").value;
+    const file = document.getElementById("image").files[0];
+
+    let imageURL = "";
+
+    if(file){
+        const imgRef = ref(storage, "images/" + Date.now());
+        await uploadBytes(imgRef, file);
+        imageURL = await getDownloadURL(imgRef);
+    }
+
+    await setDoc(docRef, {
+        title: title,
+        desc: desc,
+        image: imageURL,
+        time: Date.now()
+    });
+
+    alert("Posted!");
+
+    document.getElementById("title").value = "";
+    document.getElementById("desc").value = "";
+    document.getElementById("image").value = "";
+}
+
+</script>
+
+</body>
+</html>
