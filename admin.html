@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
 <title>Staff Panel</title>
 
 <style>
@@ -10,38 +9,79 @@ body{
     background:#111;
     color:white;
     margin:0;
+    display:flex;
+}
+
+/* LEFT SIDE */
+.left{
+    width:70%;
     padding:20px;
+}
+
+/* RIGHT LOG PANEL */
+.right{
+    width:30%;
+    background:#1a1a1a;
+    padding:15px;
+    border-left:2px solid #333;
+    height:100vh;
+    overflow:auto;
 }
 
 .card{
     background:#222;
     padding:10px;
     margin-bottom:10px;
-    border-radius:10px;
+    border-radius:8px;
+}
+
+input,textarea{
+    width:100%;
+    padding:8px;
+    margin-bottom:10px;
 }
 
 button{
     padding:8px;
-    margin-top:5px;
     cursor:pointer;
+}
+
+.log{
+    font-size:12px;
+    background:#222;
+    padding:8px;
+    margin-bottom:5px;
+    border-radius:6px;
+    color:#aaa;
 }
 </style>
 </head>
 
 <body>
 
-<h2>Admin Panel</h2>
+<div class="left">
 
-<input id="title" placeholder="Title"><br><br>
-<textarea id="desc" placeholder="Description"></textarea><br><br>
-<input id="image" placeholder="Image URL (optional)"><br><br>
+<h2>Staff Panel</h2>
 
+<p id="welcome"></p>
+
+<input id="title" placeholder="Title">
+<textarea id="desc" placeholder="Description"></textarea>
+<input id="image" placeholder="Image URL (optional)">
 <button onclick="post()">Post</button>
 
 <hr>
 
-<h3>Manage Posts</h3>
-<div id="adminFeed"></div>
+<h3>Posts</h3>
+<div id="posts"></div>
+
+</div>
+
+<!-- LOG PANEL -->
+<div class="right">
+<h3>Activity Logs</h3>
+<div id="logs"></div>
+</div>
 
 <script type="module">
 
@@ -69,7 +109,25 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-const adminFeed = document.getElementById("adminFeed");
+const postsDiv = document.getElementById("posts");
+const logsDiv = document.getElementById("logs");
+
+/* USER */
+const user = sessionStorage.getItem("staffUser");
+if(!user){
+    window.location.href = "login.html";
+}
+document.getElementById("welcome").innerText = "Logged in as " + user;
+
+/* LOG FUNCTION */
+async function log(action, text){
+    await addDoc(collection(db,"logs"),{
+        user,
+        action,
+        text,
+        time: Date.now()
+    });
+}
 
 /* POST */
 window.post = async function(){
@@ -85,36 +143,57 @@ window.post = async function(){
         time: Date.now()
     });
 
+    await log("POSTED", title);
+
     alert("Posted!");
 }
 
-/* LOAD + DELETE */
-const q = query(collection(db,"posts"), orderBy("time","desc"));
+/* LOAD POSTS */
+const q1 = query(collection(db,"posts"), orderBy("time","desc"));
 
-onSnapshot(q,(snapshot)=>{
-    adminFeed.innerHTML = "";
+onSnapshot(q1,(snap)=>{
+    postsDiv.innerHTML = "";
 
-    snapshot.forEach((d)=>{
+    snap.forEach((d)=>{
         const data = d.data();
 
-        adminFeed.innerHTML += `
+        postsDiv.innerHTML += `
         <div class="card">
             <b>${data.title}</b>
             <p>${data.desc}</p>
-
-            <button onclick="del('${d.id}')">Delete</button>
+            <button onclick="del('${d.id}','${data.title}')">Delete</button>
         </div>
         `;
     });
 });
 
-/* DELETE FUNCTION */
-window.del = async function(id){
+/* DELETE */
+window.del = async function(id,title){
     await deleteDoc(doc(db,"posts",id));
-    alert("Deleted!");
+    await log("DELETED", title);
 }
 
+/* LOGS */
+const q2 = query(collection(db,"logs"), orderBy("time","desc"));
+
+onSnapshot(q2,(snap)=>{
+    logsDiv.innerHTML = "";
+
+    snap.forEach((d)=>{
+        const l = d.data();
+
+        logsDiv.innerHTML += `
+        <div class="log">
+            [${l.user}] ${l.action}: ${l.text}
+        </div>
+        `;
+    });
+});
+
 </script>
+
+</body>
+</html>
 
 </body>
 </html>
