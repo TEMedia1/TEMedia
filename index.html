@@ -6,9 +6,10 @@
 <title>Tasmanian Emergency Media</title>
 
 <style>
+
 body{
     margin:0;
-    font-family:Arial, sans-serif;
+    font-family:Arial,sans-serif;
     background:#f5f5f5;
 }
 
@@ -62,7 +63,6 @@ nav a{
 
 .main-text h1{
     font-size:42px;
-    margin-top:0;
 }
 
 .news-grid{
@@ -85,8 +85,47 @@ nav a{
     padding:15px;
 }
 
-.card h3{
-    margin-top:0;
+.floating-btn{
+    position:fixed;
+    bottom:20px;
+    right:20px;
+    width:65px;
+    height:65px;
+    border-radius:50%;
+    background:red;
+    color:white;
+    border:none;
+    font-size:40px;
+    cursor:pointer;
+    box-shadow:0 4px 10px rgba(0,0,0,0.3);
+}
+
+.admin-panel{
+    display:none;
+    position:fixed;
+    bottom:100px;
+    right:20px;
+    background:white;
+    padding:20px;
+    width:320px;
+    border-radius:10px;
+    box-shadow:0 0 20px rgba(0,0,0,0.3);
+}
+
+.admin-panel input,
+.admin-panel textarea{
+    width:100%;
+    margin-bottom:10px;
+    padding:10px;
+}
+
+.admin-panel button{
+    background:red;
+    color:white;
+    border:none;
+    padding:10px;
+    width:100%;
+    cursor:pointer;
 }
 
 footer{
@@ -108,71 +147,153 @@ footer{
 }
 
 }
+
 </style>
 </head>
 
 <body>
 
 <header>
-    <div class="logo">Tasmanian Emergency Media</div>
 
-    <nav>
-        <a href="#">Latest</a>
-    </nav>
+<div class="logo">Tasmanian Emergency Media</div>
+
+<nav>
+<a href="#">Latest</a>
+<a href="#">Fires</a>
+<a href="#">Police</a>
+<a href="#">SES</a>
+<a href="#">Ambulance</a>
+</nav>
+
 </header>
 
 <div class="container">
 
-    <div class="main-story">
+<div class="main-story">
 
-        <div class="main-text">
-            <h1>Major Structure Fire In Hobart Overnight</h1>
+<div class="main-text">
+<h1 id="mainTitle">Latest Emergency Incident</h1>
 
-            <p>
-                Fire crews responded to a large commercial building fire overnight,
-                with multiple appliances attending the scene.
-            </p>
-        </div>
+<p id="mainDesc">
+Welcome to Tasmanian Emergency Media.
+Stay updated with emergency incidents around Tasmania.
+</p>
+</div>
 
-        <img src="https://images.unsplash.com/photo-1517423440428-a5a00ad493e8?q=80&w=1200&auto=format&fit=crop">
-    </div>
+<img id="mainImage"
+src="https://images.unsplash.com/photo-1517423440428-a5a00ad493e8?q=80&w=1200&auto=format&fit=crop">
 
-    <div class="news-grid">
+</div>
 
-        <div class="card">
-            <img src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?q=80&w=1200&auto=format&fit=crop">
+<div class="news-grid">
 
-            <div class="card-content">
-                <h3>Police Incident Closes Main Road</h3>
-                <p>Traffic delays continue after emergency services response.</p>
-            </div>
-        </div>
+<div class="card">
+<img src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?q=80&w=1200&auto=format&fit=crop">
 
-        <div class="card">
-            <img src="https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?q=80&w=1200&auto=format&fit=crop">
+<div class="card-content">
+<h3>Police Incident</h3>
+<p>Emergency crews attended the scene.</p>
+</div>
+</div>
 
-            <div class="card-content">
-                <h3>SES Crews Respond To Storm Damage</h3>
-                <p>Strong winds caused trees to fall across southern Tasmania.</p>
-            </div>
-        </div>
+<div class="card">
+<img src="https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?q=80&w=1200&auto=format&fit=crop">
 
-        <div class="card">
-            <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop">
+<div class="card-content">
+<h3>Storm Damage</h3>
+<p>SES crews responded overnight.</p>
+</div>
+</div>
 
-            <div class="card-content">
-                <h3>Ambulance Tasmania Attends Crash</h3>
-                <p>Emergency crews responded to a two-vehicle collision.</p>
-            </div>
-        </div>
+<div class="card">
+<img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop">
 
-    </div>
+<div class="card-content">
+<h3>Vehicle Crash</h3>
+<p>Ambulance Tasmania attended.</p>
+</div>
+</div>
+
+</div>
+
+</div>
+
+<button class="floating-btn" onclick="openAdmin()">+</button>
+
+<div class="admin-panel" id="adminPanel">
+
+<input type="password" id="passwordBox" placeholder="Password">
+
+<button onclick="login()">Login</button>
+
+<div id="editor" style="display:none;">
+
+<input type="text" id="titleInput" placeholder="Title">
+
+<textarea id="descInput" placeholder="Description"></textarea>
+
+<input type="file" id="imageInput" accept="image/*">
+
+<button onclick="updatePost()">Update Latest Media</button>
+
+</div>
 
 </div>
 
 <footer>
 © 2026 Tasmanian Emergency Media
 </footer>
+
+<script>
+
+function openAdmin(){
+    document.getElementById("adminPanel").style.display = "block";
+}
+
+function login(){
+
+    let p = document.getElementById("passwordBox").value;
+
+    let hidden = ["G","H","5","5","3","2"].join("");
+
+    if(p === hidden){
+
+        document.getElementById("editor").style.display = "block";
+
+    } else {
+
+        alert("Wrong password");
+
+    }
+}
+
+function updatePost(){
+
+    let title = document.getElementById("titleInput").value;
+    let desc = document.getElementById("descInput").value;
+    let file = document.getElementById("imageInput").files[0];
+
+    document.getElementById("mainTitle").innerText = title;
+    document.getElementById("mainDesc").innerText = desc;
+
+    if(file){
+
+        let reader = new FileReader();
+
+        reader.onload = function(e){
+
+            document.getElementById("mainImage").src = e.target.result;
+
+        }
+
+        reader.readAsDataURL(file);
+    }
+
+    alert("Latest media updated!");
+
+}
+
+</script>
 
 </body>
 </html>
