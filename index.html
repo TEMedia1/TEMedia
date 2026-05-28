@@ -1,14 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Tasmanian Emergency Media</title>
+
+<style>
+
+body{
+    font-family:Arial,sans-serif;
+    margin:40px;
+    background:white;
+    color:black;
+}
+
+.post{
+    max-width:800px;
+    margin:auto;
+}
+
+img{
+    max-width:100%;
+    margin-top:20px;
+}
+
+.floating-btn{
+    position:fixed;
+    bottom:20px;
+    right:20px;
+    width:60px;
+    height:60px;
+    border:none;
+    border-radius:50%;
+    font-size:35px;
+    cursor:pointer;
+}
+
+.admin{
+    display:none;
+    position:fixed;
+    bottom:90px;
+    right:20px;
+    background:white;
+    border:1px solid black;
+    padding:20px;
+    width:300px;
+}
+
+.admin input,
+.admin textarea{
+    width:100%;
+    margin-bottom:10px;
+    padding:8px;
+}
+
+.admin button{
+    width:100%;
+    padding:10px;
+    cursor:pointer;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="post">
+
+<h1 id="title">Latest Media</h1>
+
+<p id="desc">
+No updates yet.
+</p>
+
+<img id="image" src="">
+
+</div>
+
+<button class="floating-btn" onclick="openAdmin()">+</button>
+
+<div class="admin" id="adminPanel">
+
+<input type="password" id="password" placeholder="Password">
+
+<button onclick="login()">Login</button>
+
+<div id="editor" style="display:none;">
+
+<input type="text" id="newTitle" placeholder="Title">
+
+<textarea id="newDesc" placeholder="Description"></textarea>
+
+<input type="file" id="newImage" accept="image/*">
+
+<button onclick="updatePost()">Post</button>
+
+</div>
+
+</div>
+
 <script>
 
 function openAdmin(){
+
     document.getElementById("adminPanel").style.display = "block";
+
 }
 
 function login(){
 
-    let pass = document.getElementById("password").value;
+    let pass =
+    document.getElementById("password").value;
 
-    let secret = ["G","H","5","5","3","2"].join("");
+    let secret =
+    ["G","H","5","5","3","2"].join("");
 
     if(pass === secret){
 
@@ -35,9 +143,11 @@ function updatePost(){
     document.getElementById("desc").innerText = desc;
 
     localStorage.setItem("savedTitle", title);
+
     localStorage.setItem("savedDesc", desc);
 
-    let file = document.getElementById("newImage").files[0];
+    let file =
+    document.getElementById("newImage").files[0];
 
     if(file){
 
@@ -61,22 +171,39 @@ function updatePost(){
 
 window.onload = function(){
 
-    let savedTitle = localStorage.getItem("savedTitle");
-    let savedDesc = localStorage.getItem("savedDesc");
-    let savedImage = localStorage.getItem("savedImage");
+    let savedTitle =
+    localStorage.getItem("savedTitle");
+
+    let savedDesc =
+    localStorage.getItem("savedDesc");
+
+    let savedImage =
+    localStorage.getItem("savedImage");
 
     if(savedTitle){
-        document.getElementById("title").innerText = savedTitle;
+
+        document.getElementById("title").innerText =
+        savedTitle;
+
     }
 
     if(savedDesc){
-        document.getElementById("desc").innerText = savedDesc;
+
+        document.getElementById("desc").innerText =
+        savedDesc;
+
     }
 
     if(savedImage){
-        document.getElementById("image").src = savedImage;
+
+        document.getElementById("image").src =
+        savedImage;
+
     }
 
 }
 
 </script>
+
+</body>
+</html>
