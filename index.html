@@ -17,53 +17,26 @@ body{
 .post{
     max-width:800px;
     margin:auto;
+}
+
+/* each update box */
+.card{
     background:#222;
-    padding:20px;
+    padding:15px;
+    margin-bottom:15px;
     border-radius:10px;
 }
 
 img{
     max-width:100%;
-    margin-top:20px;
-    display:none;
+    margin-top:10px;
+    border-radius:8px;
 }
 
-.floating-btn{
-    position:fixed;
-    bottom:20px;
-    right:20px;
-    width:60px;
-    height:60px;
-    border:none;
-    border-radius:50%;
-    font-size:35px;
-    cursor:pointer;
-}
-
-.admin{
-    display:none;
-    position:fixed;
-    bottom:90px;
-    right:20px;
-    background:white;
-    color:black;
-    border:1px solid black;
-    padding:20px;
-    width:300px;
-    border-radius:10px;
-}
-
-.admin input,
-.admin textarea{
-    width:100%;
-    margin-bottom:10px;
-    padding:8px;
-}
-
-.admin button{
-    width:100%;
-    padding:10px;
-    cursor:pointer;
+.time{
+    font-size:12px;
+    color:#aaa;
+    margin-top:5px;
 }
 </style>
 </head>
@@ -71,14 +44,14 @@ img{
 <body>
 
 <div class="post">
-<h1 id="title">Loading...</h1>
-<p id="desc">Waiting for updates...</p>
-<img id="image">
+<h1>Tasmanian Emergency Media</h1>
+
+<div id="feed"></div>
 </div>
 
 <button class="floating-btn" onclick="openAdmin()">+</button>
 
-<div class="admin" id="adminPanel">
+<div class="admin" id="adminPanel" style="display:none; position:fixed; bottom:90px; right:20px; background:white; color:black; padding:20px; width:300px;">
 <input type="password" id="password" placeholder="Password">
 <button onclick="login()">Login</button>
 
@@ -91,12 +64,15 @@ img{
 </div>
 
 <script type="module">
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
 getFirestore,
-doc,
-setDoc,
-onSnapshot
+collection,
+addDoc,
+onSnapshot,
+query,
+orderBy
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -111,38 +87,48 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-const docRef = doc(db, "posts", "latest");
+const feed = document.getElementById("feed");
 
-// LIVE UPDATES
-onSnapshot(docRef, (docSnap) => {
-    if(docSnap.exists()){
-        const data = docSnap.data();
+/* timestamp helper */
+function timeAgo(t){
+    if(!t) return "";
+    let s = Math.floor((Date.now() - t)/1000);
 
-        document.getElementById("title").innerText =
-        data.title || "Latest Media";
+    if(s < 60) return "just now";
+    if(s < 3600) return Math.floor(s/60)+" min ago";
+    if(s < 86400) return Math.floor(s/3600)+" hours ago";
+    return Math.floor(s/86400)+" days ago";
+}
 
-        document.getElementById("desc").innerText =
-        data.desc || "";
+/* LIVE FEED */
+const q = query(collection(db, "posts"), orderBy("time", "desc"));
 
-        const img = document.getElementById("image");
+onSnapshot(q, (snapshot)=>{
+    feed.innerHTML = "";
 
-        if(data.image){
-            img.src = data.image;
-            img.style.display = "block";
-        } else {
-            img.style.display = "none";
-        }
-    }
+    snapshot.forEach((doc)=>{
+        const d = doc.data();
+
+        feed.innerHTML += `
+        <div class="card">
+            <h2>${d.title || ""}</h2>
+            <p>${d.desc || ""}</p>
+
+            ${d.image ? `<img src="${d.image}">` : ""}
+
+            <div class="time">${timeAgo(d.time)}</div>
+        </div>
+        `;
+    });
 });
 
-// UI functions
+/* admin UI */
 window.openAdmin = function(){
     document.getElementById("adminPanel").style.display = "block";
 }
 
 window.login = function(){
     let pass = document.getElementById("password").value;
-
     let secret = ["G","H","5","5","3","2"].join("");
 
     if(pass === secret){
@@ -152,15 +138,18 @@ window.login = function(){
     }
 }
 
+/* POST NEW UPDATE */
 window.updatePost = async function(){
-    let title = document.getElementById("newTitle").value;
-    let desc = document.getElementById("newDesc").value;
-    let image = document.getElementById("newImage").value;
 
-    await setDoc(docRef, {
-        title: title,
-        desc: desc,
-        image: image
+    const title = document.getElementById("newTitle").value;
+    const desc = document.getElementById("newDesc").value;
+    const image = document.getElementById("newImage").value;
+
+    await addDoc(collection(db,"posts"),{
+        title,
+        desc,
+        image,
+        time: Date.now()
     });
 
     alert("Posted!");
@@ -169,6 +158,7 @@ window.updatePost = async function(){
     document.getElementById("newDesc").value = "";
     document.getElementById("newImage").value = "";
 }
+
 </script>
 
 </body>
