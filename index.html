@@ -7,18 +7,61 @@
 
 <style>
 body{
-    font-family:Arial;
-    background:#111;
-    color:white;
+    font-family: Arial, sans-serif;
     margin:0;
+    background:#0b1220; /* more professional dark blue */
+    color:#fff;
 }
 
+/* HEADER */
 header{
-    background:red;
-    padding:15px;
+    background: linear-gradient(90deg, #b30000, #1b2a4a);
+    padding:18px;
     text-align:center;
+    font-weight:bold;
+    letter-spacing:1px;
 }
 
+/* POST CREATOR */
+.create-box{
+    max-width:800px;
+    margin:20px auto;
+    background:#121a2b;
+    padding:15px;
+    border-radius:10px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.4);
+}
+
+.create-box input,
+.create-box textarea{
+    width:100%;
+    margin-top:8px;
+    padding:10px;
+    border-radius:6px;
+    border:none;
+    background:#0b1220;
+    color:white;
+}
+
+.create-box button{
+    margin-top:10px;
+    padding:10px 15px;
+    border:none;
+    background:#b30000;
+    color:white;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+/* IMAGE PREVIEW */
+#preview{
+    margin-top:10px;
+    max-width:100%;
+    border-radius:8px;
+    display:none;
+}
+
+/* FEED */
 .feed{
     max-width:800px;
     margin:auto;
@@ -26,15 +69,16 @@ header{
 }
 
 .card{
-    background:#222;
+    background:#121a2b;
     padding:15px;
     margin-bottom:15px;
     border-radius:10px;
+    box-shadow:0 4px 10px rgba(0,0,0,0.3);
 }
 
 .emergency{
-    border-left:5px solid red;
-    background:#2a0000;
+    border-left:5px solid #ff3b3b;
+    background:#1a0f12;
 }
 
 img{
@@ -47,8 +91,9 @@ img{
     font-size:12px;
     color:#aaa;
 }
+
 .badge{
-    background:red;
+    background:#ff3b3b;
     padding:3px 8px;
     font-size:12px;
     border-radius:5px;
@@ -63,6 +108,22 @@ img{
 <header>
 <h1>Tasmanian Emergency Media</h1>
 </header>
+
+<!-- ✅ NEW POST AREA -->
+<div class="create-box">
+    <h3>Create Post</h3>
+
+    <input type="text" id="title" placeholder="Title">
+    <textarea id="desc" placeholder="Description"></textarea>
+
+    <input type="file" id="imageInput" accept="image/*">
+
+    <img id="preview">
+
+    <button onclick="alert('Next step: connect to Firebase upload')">
+        Upload Post
+    </button>
+</div>
 
 <div class="feed" id="feed"></div>
 
@@ -90,6 +151,18 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 const feed = document.getElementById("feed");
+
+/* IMAGE PREVIEW */
+const imageInput = document.getElementById("imageInput");
+const preview = document.getElementById("preview");
+
+imageInput.addEventListener("change", (e)=>{
+    const file = e.target.files[0];
+    if(file){
+        preview.src = URL.createObjectURL(file);
+        preview.style.display = "block";
+    }
+});
 
 function timeFormat(t){
     if(!t) return "";
