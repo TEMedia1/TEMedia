@@ -3,68 +3,71 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tasmanian Emergency Media</title>
+<title>TEM Mobile Feed</title>
 
 <style>
 body{
     font-family: Arial, sans-serif;
     margin:0;
-    background:#f4f6f9; /* light professional background */
+    background:#f4f6f9;
     color:#1a1a1a;
 }
 
-/* HEADER */
+/* MOBILE APP BAR */
 header{
+    position:sticky;
+    top:0;
     background:#0f172a;
     color:white;
-    padding:18px;
-    text-align:center;
+    padding:12px 14px;
+    font-size:16px;
     font-weight:600;
-    letter-spacing:0.5px;
+    text-align:center;
+    z-index:10;
+    box-shadow:0 2px 10px rgba(0,0,0,0.15);
 }
 
-/* FEED WRAPPER */
+/* FEED */
 .feed{
-    max-width:850px;
-    margin:25px auto;
-    padding:0 15px;
+    max-width:480px; /* phone width lock */
+    margin:0 auto;
+    padding:10px;
 }
 
 /* CARD */
 .card{
     background:white;
-    padding:16px;
-    margin-bottom:14px;
-    border-radius:10px;
+    padding:12px;
+    margin-bottom:10px;
+    border-radius:12px;
     border:1px solid #e6e8ec;
-    box-shadow:0 2px 8px rgba(0,0,0,0.05);
-    transition:0.2s ease;
+    box-shadow:0 1px 6px rgba(0,0,0,0.05);
 }
 
-.card:hover{
-    transform:translateY(-2px);
-    box-shadow:0 6px 18px rgba(0,0,0,0.08);
+.card:active{
+    transform:scale(0.99);
 }
 
-/* EMERGENCY STYLE (clean but noticeable) */
+/* EMERGENCY */
 .emergency{
-    border-left:5px solid #dc2626;
+    border-left:4px solid #dc2626;
 }
 
 /* TEXT */
 h2{
-    margin:0 0 6px 0;
-    font-size:18px;
+    margin:0 0 5px 0;
+    font-size:16px;
 }
 
 p{
-    margin:6px 0;
-    line-height:1.4;
+    margin:5px 0;
+    font-size:14px;
+    line-height:1.35;
 }
 
-/* META INFO */
+/* META */
 .meta{
-    font-size:12px;
+    font-size:11px;
     color:#6b7280;
 }
 
@@ -72,19 +75,19 @@ p{
 .badge{
     background:#dc2626;
     color:white;
-    padding:3px 8px;
-    font-size:11px;
-    border-radius:6px;
+    padding:3px 7px;
+    font-size:10px;
+    border-radius:5px;
     display:inline-block;
-    margin-bottom:8px;
+    margin-bottom:6px;
     font-weight:600;
 }
 
 /* IMAGE */
 img{
     width:100%;
-    border-radius:8px;
-    margin-top:10px;
+    border-radius:10px;
+    margin-top:8px;
     border:1px solid #e5e7eb;
 }
 </style>
@@ -93,7 +96,7 @@ img{
 <body>
 
 <header>
-    Tasmanian Emergency Media
+    TEM • Live Feed
 </header>
 
 <div class="feed" id="feed"></div>
@@ -125,8 +128,7 @@ const feed = document.getElementById("feed");
 
 function timeFormat(t){
     if(!t) return "";
-    const d = new Date(t);
-    return d.toLocaleString();
+    return new Date(t).toLocaleString();
 }
 
 const q = query(collection(db,"posts"), orderBy("time","desc"));
