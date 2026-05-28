@@ -12,8 +12,6 @@
 body{
     font-family:Arial,sans-serif;
     margin:40px;
-    background:white;
-    color:black;
 }
 
 .post{
@@ -59,7 +57,6 @@ img{
 .admin button{
     width:100%;
     padding:10px;
-    cursor:pointer;
 }
 
 </style>
@@ -72,11 +69,9 @@ img{
 
 <h1 id="title">Latest Media</h1>
 
-<p id="desc">
-No updates yet.
-</p>
+<p id="desc">No updates yet.</p>
 
-<img id="image" src="">
+<img id="image">
 
 </div>
 
@@ -94,7 +89,7 @@ No updates yet.
 
 <textarea id="newDesc" placeholder="Description"></textarea>
 
-<input type="file" id="newImage" accept="image/*">
+<input type="text" id="newImage" placeholder="Image URL">
 
 <button onclick="updatePost()">Post</button>
 
@@ -102,15 +97,42 @@ No updates yet.
 
 </div>
 
-<script>
+<script type="module">
 
-function openAdmin(){
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+getFirestore,
+doc,
+setDoc,
+getDoc
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+    
+  apiKey: "AIzaSyBQ-dRGRRLNE0YmuKov05mY54oWCSzp3zY",
+  authDomain: "temedia1000.firebaseapp.com",
+  projectId: "temedia1000",
+  storageBucket: "temedia1000.firebasestorage.app",
+  messagingSenderId: "534982245676",
+  appId: "1:534982245676:web:a4fdc146c2adf843e08089",
+  measurementId: "G-E8SF3826KN"
+
+};
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
+window.openAdmin = function(){
 
     document.getElementById("adminPanel").style.display = "block";
 
 }
 
-function login(){
+window.login = function(){
 
     let pass =
     document.getElementById("password").value;
@@ -130,7 +152,7 @@ function login(){
 
 }
 
-function updatePost(){
+window.updatePost = async function(){
 
     let title =
     document.getElementById("newTitle").value;
@@ -138,70 +160,45 @@ function updatePost(){
     let desc =
     document.getElementById("newDesc").value;
 
-    document.getElementById("title").innerText = title;
+    let image =
+    document.getElementById("newImage").value;
 
-    document.getElementById("desc").innerText = desc;
+    await setDoc(doc(db, "posts", "latest"), {
 
-    localStorage.setItem("savedTitle", title);
+        title:title,
+        desc:desc,
+        image:image
 
-    localStorage.setItem("savedDesc", desc);
+    });
 
-    let file =
-    document.getElementById("newImage").files[0];
-
-    if(file){
-
-        let reader = new FileReader();
-
-        reader.onload = function(e){
-
-            let imageData = e.target.result;
-
-            document.getElementById("image").src = imageData;
-
-            localStorage.setItem("savedImage", imageData);
-
-        }
-
-        reader.readAsDataURL(file);
-
-    }
+    loadPost();
 
 }
 
-window.onload = function(){
+async function loadPost(){
 
-    let savedTitle =
-    localStorage.getItem("savedTitle");
+    const docRef = doc(db, "posts", "latest");
 
-    let savedDesc =
-    localStorage.getItem("savedDesc");
+    const docSnap = await getDoc(docRef);
 
-    let savedImage =
-    localStorage.getItem("savedImage");
+    if(docSnap.exists()){
 
-    if(savedTitle){
+        const data = docSnap.data();
 
         document.getElementById("title").innerText =
-        savedTitle;
-
-    }
-
-    if(savedDesc){
+        data.title;
 
         document.getElementById("desc").innerText =
-        savedDesc;
-
-    }
-
-    if(savedImage){
+        data.desc;
 
         document.getElementById("image").src =
-        savedImage;
+        data.image;
 
     }
 
 }
+
+loadPost();
 
 </script>
 
