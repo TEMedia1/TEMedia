@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -57,10 +56,10 @@ img{
 .admin button{
     width:100%;
     padding:10px;
+    cursor:pointer;
 }
 
 </style>
-
 </head>
 
 <body>
@@ -99,106 +98,78 @@ img{
 
 <script type="module">
 
-import { initializeApp }
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
 getFirestore,
 doc,
 setDoc,
-getDoc
-}
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+onSnapshot
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
-    
   apiKey: "AIzaSyBQ-dRGRRLNE0YmuKov05mY54oWCSzp3zY",
   authDomain: "temedia1000.firebaseapp.com",
   projectId: "temedia1000",
   storageBucket: "temedia1000.firebasestorage.app",
   messagingSenderId: "534982245676",
-  appId: "1:534982245676:web:a4fdc146c2adf843e08089",
-  measurementId: "G-E8SF3826KN"
-
+  appId: "1:534982245676:web:a4fdc146c2adf843e08089"
 };
 
 const app = initializeApp(firebaseConfig);
-
 const db = getFirestore(app);
 
-window.openAdmin = function(){
+const docRef = doc(db, "posts", "latest");
 
-    document.getElementById("adminPanel").style.display = "block";
-
-}
-
-window.login = function(){
-
-    let pass =
-    document.getElementById("password").value;
-
-    let secret =
-    ["G","H","5","5","3","2"].join("");
-
-    if(pass === secret){
-
-        document.getElementById("editor").style.display = "block";
-
-    } else {
-
-        alert("Wrong password");
-
-    }
-
-}
-
-window.updatePost = async function(){
-
-    let title =
-    document.getElementById("newTitle").value;
-
-    let desc =
-    document.getElementById("newDesc").value;
-
-    let image =
-    document.getElementById("newImage").value;
-
-    await setDoc(doc(db, "posts", "latest"), {
-
-        title:title,
-        desc:desc,
-        image:image
-
-    });
-
-    loadPost();
-
-}
-
-async function loadPost(){
-
-    const docRef = doc(db, "posts", "latest");
-
-    const docSnap = await getDoc(docRef);
+onSnapshot(docRef, (docSnap) => {
 
     if(docSnap.exists()){
 
         const data = docSnap.data();
 
         document.getElementById("title").innerText =
-        data.title;
+        data.title || "Latest Media";
 
         document.getElementById("desc").innerText =
-        data.desc;
+        data.desc || "";
 
         document.getElementById("image").src =
-        data.image;
+        data.image || "";
 
+    }
+
+});
+
+window.openAdmin = function(){
+    document.getElementById("adminPanel").style.display = "block";
+}
+
+window.login = function(){
+
+    let pass = document.getElementById("password").value;
+
+    let secret = ["G","H","5","5","3","2"].join("");
+
+    if(pass === secret){
+        document.getElementById("editor").style.display = "block";
+    } else {
+        alert("Wrong password");
     }
 
 }
 
-loadPost();
+window.updatePost = async function(){
+
+    let title = document.getElementById("newTitle").value;
+    let desc = document.getElementById("newDesc").value;
+    let image = document.getElementById("newImage").value;
+
+    await setDoc(docRef, {
+        title,
+        desc,
+        image
+    });
+
+}
 
 </script>
 
