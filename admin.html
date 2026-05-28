@@ -12,20 +12,23 @@ body{
     display:flex;
 }
 
-/* LEFT SIDE */
 .left{
     width:70%;
     padding:20px;
 }
 
-/* RIGHT LOG PANEL */
 .right{
     width:30%;
     background:#1a1a1a;
     padding:15px;
-    border-left:2px solid #333;
     height:100vh;
     overflow:auto;
+}
+
+input,textarea,select{
+    width:100%;
+    padding:8px;
+    margin-bottom:10px;
 }
 
 .card{
@@ -33,26 +36,6 @@ body{
     padding:10px;
     margin-bottom:10px;
     border-radius:8px;
-}
-
-input,textarea{
-    width:100%;
-    padding:8px;
-    margin-bottom:10px;
-}
-
-button{
-    padding:8px;
-    cursor:pointer;
-}
-
-.log{
-    font-size:12px;
-    background:#222;
-    padding:8px;
-    margin-bottom:5px;
-    border-radius:6px;
-    color:#aaa;
 }
 </style>
 </head>
@@ -63,11 +46,24 @@ button{
 
 <h2>Staff Panel</h2>
 
-<p id="welcome"></p>
-
 <input id="title" placeholder="Title">
 <textarea id="desc" placeholder="Description"></textarea>
-<input id="image" placeholder="Image URL (optional)">
+
+<input id="location" placeholder="Location (e.g. Hobart)">
+
+<select id="category">
+<option>Fire</option>
+<option>Rescue</option>
+<option>Traffic</option>
+<option>General</option>
+</select>
+
+<input id="image" type="file">
+
+<label>
+<input type="checkbox" id="emergency"> Emergency Mode
+</label>
+
 <button onclick="post()">Post</button>
 
 <hr>
@@ -77,9 +73,8 @@ button{
 
 </div>
 
-<!-- LOG PANEL -->
 <div class="right">
-<h3>Activity Logs</h3>
+<h3>Logs</h3>
 <div id="logs"></div>
 </div>
 
@@ -97,6 +92,13 @@ orderBy,
 onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+import {
+getStorage,
+ref,
+uploadBytes,
+getDownloadURL
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
 const firebaseConfig = {
   apiKey: "AIzaSyAIqLic00FcNgtuKZATMdHU4jRITnYO2A8",
   authDomain: "temedia20-be031.firebaseapp.com",
@@ -108,19 +110,12 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const storage = getStorage(app);
 
-const postsDiv = document.getElementById("posts");
-const logsDiv = document.getElementById("logs");
-
-/* USER */
 const user = sessionStorage.getItem("staffUser");
-if(!user){
-    window.location.href = "login.html";
-}
-document.getElementById("welcome").innerText = "Logged in as " + user;
 
-/* LOG FUNCTION */
-async function log(action, text){
+/* LOG */
+async function log(action,text){
     await addDoc(collection(db,"logs"),{
         user,
         action,
@@ -134,33 +129,47 @@ window.post = async function(){
 
     const title = document.getElementById("title").value;
     const desc = document.getElementById("desc").value;
-    const image = document.getElementById("image").value;
+    const location = document.getElementById("location").value;
+    const category = document.getElementById("category").value;
+    const emergency = document.getElementById("emergency").checked;
+
+    const file = document.getElementById("image").files[0];
+
+    let imageURL = "";
+
+    if(file){
+        const imgRef = ref(storage,"images/"+Date.now());
+        await uploadBytes(imgRef,file);
+        imageURL = await getDownloadURL(imgRef);
+    }
 
     await addDoc(collection(db,"posts"),{
         title,
         desc,
-        image,
-        time: Date.now()
+        location,
+        category,
+        emergency,
+        image:imageURL,
+        time:Date.now()
     });
 
-    await log("POSTED", title);
+    await log("POSTED",title);
 
     alert("Posted!");
 }
 
-/* LOAD POSTS */
-const q1 = query(collection(db,"posts"), orderBy("time","desc"));
+/* POSTS */
+const q1 = query(collection(db,"posts"),orderBy("time","desc"));
 
 onSnapshot(q1,(snap)=>{
-    postsDiv.innerHTML = "";
+    posts.innerHTML="";
 
     snap.forEach((d)=>{
-        const data = d.data();
+        const data=d.data();
 
-        postsDiv.innerHTML += `
+        posts.innerHTML+=`
         <div class="card">
-            <b>${data.title}</b>
-            <p>${data.desc}</p>
+            <b>${data.title}</b><br>
             <button onclick="del('${d.id}','${data.title}')">Delete</button>
         </div>
         `;
@@ -170,20 +179,20 @@ onSnapshot(q1,(snap)=>{
 /* DELETE */
 window.del = async function(id,title){
     await deleteDoc(doc(db,"posts",id));
-    await log("DELETED", title);
+    await log("DELETED",title);
 }
 
 /* LOGS */
-const q2 = query(collection(db,"logs"), orderBy("time","desc"));
+const q2 = query(collection(db,"logs"),orderBy("time","desc"));
 
 onSnapshot(q2,(snap)=>{
-    logsDiv.innerHTML = "";
+    logs.innerHTML="";
 
     snap.forEach((d)=>{
-        const l = d.data();
+        const l=d.data();
 
-        logsDiv.innerHTML += `
-        <div class="log">
+        logs.innerHTML+=`
+        <div class="card">
             [${l.user}] ${l.action}: ${l.text}
         </div>
         `;
@@ -191,9 +200,6 @@ onSnapshot(q2,(snap)=>{
 });
 
 </script>
-
-</body>
-</html>
 
 </body>
 </html>
