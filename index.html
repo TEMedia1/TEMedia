@@ -9,17 +9,23 @@
 <style>
 body{
     font-family:Arial,sans-serif;
-    margin:40px;
+    margin:0;
     background:#111;
     color:white;
 }
 
-.post{
-    max-width:800px;
-    margin:auto;
+header{
+    background:red;
+    padding:15px;
+    text-align:center;
 }
 
-/* each update box */
+.feed{
+    max-width:800px;
+    margin:auto;
+    padding:20px;
+}
+
 .card{
     background:#222;
     padding:15px;
@@ -43,25 +49,11 @@ img{
 
 <body>
 
-<div class="post">
+<header>
 <h1>Tasmanian Emergency Media</h1>
+</header>
 
-<div id="feed"></div>
-</div>
-
-<button class="floating-btn" onclick="openAdmin()">+</button>
-
-<div class="admin" id="adminPanel" style="display:none; position:fixed; bottom:90px; right:20px; background:white; color:black; padding:20px; width:300px;">
-<input type="password" id="password" placeholder="Password">
-<button onclick="login()">Login</button>
-
-<div id="editor" style="display:none;">
-<input type="text" id="newTitle" placeholder="Title">
-<textarea id="newDesc" placeholder="Description"></textarea>
-<input type="text" id="newImage" placeholder="Image URL (optional)">
-<button onclick="updatePost()">Post</button>
-</div>
-</div>
+<div class="feed" id="feed"></div>
 
 <script type="module">
 
@@ -69,10 +61,9 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 import {
 getFirestore,
 collection,
-addDoc,
-onSnapshot,
 query,
-orderBy
+orderBy,
+onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -89,21 +80,18 @@ const db = getFirestore(app);
 
 const feed = document.getElementById("feed");
 
-/* timestamp helper */
 function timeAgo(t){
     if(!t) return "";
     let s = Math.floor((Date.now() - t)/1000);
-
     if(s < 60) return "just now";
     if(s < 3600) return Math.floor(s/60)+" min ago";
     if(s < 86400) return Math.floor(s/3600)+" hours ago";
     return Math.floor(s/86400)+" days ago";
 }
 
-/* LIVE FEED */
-const q = query(collection(db, "posts"), orderBy("time", "desc"));
+const q = query(collection(db,"posts"), orderBy("time","desc"));
 
-onSnapshot(q, (snapshot)=>{
+onSnapshot(q,(snapshot)=>{
     feed.innerHTML = "";
 
     snapshot.forEach((doc)=>{
@@ -113,51 +101,12 @@ onSnapshot(q, (snapshot)=>{
         <div class="card">
             <h2>${d.title || ""}</h2>
             <p>${d.desc || ""}</p>
-
             ${d.image ? `<img src="${d.image}">` : ""}
-
             <div class="time">${timeAgo(d.time)}</div>
         </div>
         `;
     });
 });
-
-/* admin UI */
-window.openAdmin = function(){
-    document.getElementById("adminPanel").style.display = "block";
-}
-
-window.login = function(){
-    let pass = document.getElementById("password").value;
-    let secret = ["G","H","5","5","3","2"].join("");
-
-    if(pass === secret){
-        document.getElementById("editor").style.display = "block";
-    } else {
-        alert("Wrong password");
-    }
-}
-
-/* POST NEW UPDATE */
-window.updatePost = async function(){
-
-    const title = document.getElementById("newTitle").value;
-    const desc = document.getElementById("newDesc").value;
-    const image = document.getElementById("newImage").value;
-
-    await addDoc(collection(db,"posts"),{
-        title,
-        desc,
-        image,
-        time: Date.now()
-    });
-
-    alert("Posted!");
-
-    document.getElementById("newTitle").value = "";
-    document.getElementById("newDesc").value = "";
-    document.getElementById("newImage").value = "";
-}
 
 </script>
 
