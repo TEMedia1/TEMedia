@@ -1,3 +1,4 @@
+```html id="4a4i58"
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,10 +8,35 @@
 <title>TEM Store</title>
 
 <style>
+
 body{
     margin:0;
+    font-family:Arial;
     background:white;
 }
+
+.store{
+    max-width:500px;
+    margin:auto;
+    padding:20px;
+}
+
+.item{
+    border:1px solid #ddd;
+    padding:20px;
+    border-radius:10px;
+}
+
+h1{
+    margin-top:0;
+}
+
+.price{
+    font-size:20px;
+    font-weight:bold;
+    margin:10px 0;
+}
+
 </style>
 
 <!-- PAYPAL SDK -->
@@ -20,20 +46,38 @@ body{
 
 <body>
 
-<!-- PAYPAL BUTTON WILL GO HERE -->
-<div id="paypal-button-container"></div>
+<div class="store">
+
+    <div class="item">
+
+        <h1>Stickers</h1>
+
+        <p>
+            Official TEM stickers.
+        </p>
+
+        <div class="price">
+            $5.00 AUD
+        </div>
+
+        <!-- PAYPAL BUTTON -->
+        <div id="paypal-button-container"></div>
+
+    </div>
+
+</div>
 
 <script>
 
-// PAYPAL BUTTON SETUP
 paypal.Buttons({
 
     createOrder: function(data, actions) {
 
         return actions.order.create({
             purchase_units: [{
+                description: "TEM Stickers",
                 amount: {
-                    value: '6.70'
+                    value: '5.00'
                 }
             }]
         });
@@ -45,7 +89,7 @@ paypal.Buttons({
         return actions.order.capture().then(function(details) {
 
             alert(
-                'Payment completed by ' +
+                "Transaction completed by " +
                 details.payer.name.given_name
             );
 
@@ -59,4 +103,3 @@ paypal.Buttons({
 
 </body>
 </html>
-```
