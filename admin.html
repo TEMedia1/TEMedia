@@ -39,18 +39,13 @@ body{
     cursor:pointer;
 }
 
-/* MAIN LAYOUT */
-.container{
-    display:flex;
-}
+.container{ display:flex; }
 
-/* LEFT */
 .left{
     width:70%;
     padding:20px;
 }
 
-/* RIGHT PANEL (hidden drawer style) */
 .right{
     width:320px;
     background:white;
@@ -65,11 +60,8 @@ body{
     z-index:15;
 }
 
-.right.open{
-    right:0;
-}
+.right.open{ right:0; }
 
-/* INPUTS */
 input,textarea,select{
     width:100%;
     padding:10px;
@@ -79,7 +71,6 @@ input,textarea,select{
     background:white;
 }
 
-/* BUTTON */
 button.main{
     width:100%;
     padding:10px;
@@ -91,7 +82,6 @@ button.main{
     cursor:pointer;
 }
 
-/* CARD */
 .card{
     background:white;
     padding:12px;
@@ -100,7 +90,6 @@ button.main{
     margin-bottom:10px;
 }
 
-/* LOG BUTTON */
 .logToggle{
     position:fixed;
     right:15px;
@@ -114,7 +103,6 @@ button.main{
     z-index:30;
 }
 
-/* LOCK SCREEN */
 .lock{
     position:fixed;
     top:0;
@@ -134,24 +122,6 @@ button.main{
     border-radius:12px;
     width:300px;
 }
-
-.lockBox input{
-    width:100%;
-    padding:10px;
-    margin-top:10px;
-}
-
-/* MOBILE */
-@media (max-width:700px){
-    .left{
-        width:100%;
-        padding:15px;
-    }
-
-    .right{
-        width:100%;
-    }
-}
 </style>
 </head>
 
@@ -161,9 +131,8 @@ button.main{
 <div class="lock" id="lock">
     <div class="lockBox">
         <h3>Staff Login</h3>
-        <p>Enter access code</p>
-        <input id="pass" placeholder="Password">
-        <button class="main" onclick="unlock()">Enter</button>
+        <p>Sign in with Google</p>
+        <button class="main" onclick="googleLogin()">Sign in with Google</button>
     </div>
 </div>
 
@@ -175,14 +144,12 @@ button.main{
 
 <div class="container">
 
-<!-- LEFT -->
 <div class="left">
 
 <h2>Post System</h2>
 
 <input id="title" placeholder="Title">
 <textarea id="desc" placeholder="Description"></textarea>
-
 <input id="location" placeholder="Location">
 
 <select id="category">
@@ -207,7 +174,7 @@ button.main{
 
 </div>
 
-<!-- LOGS DRAWER -->
+<!-- LOGS -->
 <div class="right" id="logsPanel">
 <h3>Logs</h3>
 <div id="logs"></div>
@@ -215,64 +182,66 @@ button.main{
 
 </div>
 
-<!-- FLOAT LOG BUTTON -->
 <button class="logToggle" onclick="toggleLogs()">Logs</button>
 
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {
-getFirestore,
-collection,
-addDoc,
-deleteDoc,
-doc,
-query,
-orderBy,
-onSnapshot
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, collection, addDoc, deleteDoc, doc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
-import {
-getStorage,
-ref,
-uploadBytes,
-getDownloadURL
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
-
+/* FIREBASE CONFIG */
 const firebaseConfig = {
-  apiKey: "AIzaSyAIqLic00FcNgtuKZATMdHU4jRITnYO2A8",
-  authDomain: "temedia20-be031.firebaseapp.com",
-  projectId: "temedia20-be031",
-  storageBucket: "temedia20-be031.firebasestorage.app",
-  messagingSenderId: "514394139848",
-  appId: "1:514394139848:web:7edabb080c12b87bc909fd"
+  apiKey: "AIzaSyBQ-dRGRRLNEO...",
+  authDomain: "temedia1000.firebaseapp.com",
+  projectId: "temedia1000",
+  storageBucket: "temedia1000.firebasestorage.app",
+  messagingSenderId: "534982245676",
+  appId: "1:534982245676:web:a4fdc146c2adf843e08089"
 };
 
 const app = initializeApp(firebaseConfig);
+
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+
 const db = getFirestore(app);
 const storage = getStorage(app);
 
-const user = sessionStorage.getItem("staffUser");
+/* 🔒 YOUR ADMIN UID */
+const ADMIN_UID = "LaodpGb5TVUS806xsXBCkrcx7T63";
 
-/* LOCK */
-window.unlock = function(){
-    const pass = document.getElementById("pass").value;
-    if(pass === "T4M26"){
-        document.getElementById("lock").style.display="none";
+let currentUser = null;
+let isAdmin = false;
+
+/* LOGIN */
+window.googleLogin = async function () {
+    await signInWithPopup(auth, provider);
+};
+
+/* AUTH STATE */
+onAuthStateChanged(auth, (user) => {
+    currentUser = user;
+
+    if (user && user.uid === ADMIN_UID) {
+        isAdmin = true;
+        document.getElementById("lock").style.display = "none";
     } else {
-        alert("Wrong code");
+        isAdmin = false;
+        document.getElementById("lock").style.display = "flex";
     }
-}
+});
 
 /* LOGS TOGGLE */
 window.toggleLogs = function(){
     document.getElementById("logsPanel").classList.toggle("open");
-}
+};
 
 /* LOG */
 async function log(action,text){
     await addDoc(collection(db,"logs"),{
-        user,
+        user: currentUser?.email || "unknown",
         action,
         text,
         time: Date.now()
@@ -281,6 +250,11 @@ async function log(action,text){
 
 /* POST */
 window.post = async function(){
+
+    if(!isAdmin){
+        alert("Not authorised");
+        return;
+    }
 
     const title = document.getElementById("title").value;
     const desc = document.getElementById("desc").value;
@@ -305,13 +279,14 @@ window.post = async function(){
         category,
         emergency,
         image:imageURL,
-        time:Date.now()
+        time:Date.now(),
+        uid: currentUser.uid
     });
 
-    await log("POSTED",title);
+    await log("POSTED", title);
 
     alert("Posted!");
-}
+};
 
 /* POSTS */
 const q1 = query(collection(db,"posts"),orderBy("time","desc"));
@@ -333,9 +308,15 @@ onSnapshot(q1,(snap)=>{
 
 /* DELETE */
 window.del = async function(id,title){
+
+    if(!isAdmin){
+        alert("Not authorised");
+        return;
+    }
+
     await deleteDoc(doc(db,"posts",id));
     await log("DELETED",title);
-}
+};
 
 /* LOGS */
 const q2 = query(collection(db,"logs"),orderBy("time","desc"));
