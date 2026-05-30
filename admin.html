@@ -5,18 +5,20 @@
 
 <style>
 body{
-    font-family:Arial;
-    background:#111;
+    font-family: Arial, sans-serif;
+    background:#0f172a;
     color:white;
     margin:0;
     display:flex;
 }
 
+/* LEFT PANEL */
 .left{
     width:70%;
     padding:20px;
 }
 
+/* RIGHT PANEL */
 .right{
     width:30%;
     background:#1a1a1a;
@@ -25,17 +27,79 @@ body{
     overflow:auto;
 }
 
+/* INPUTS */
 input,textarea,select{
     width:100%;
     padding:8px;
     margin-bottom:10px;
+    border-radius:6px;
+    border:none;
 }
 
+/* BUTTON */
+button{
+    padding:10px;
+    width:100%;
+    border:none;
+    border-radius:8px;
+    background:#dc2626;
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#b91c1c;
+}
+
+/* CARD */
 .card{
     background:#222;
     padding:10px;
     margin-bottom:10px;
     border-radius:8px;
+}
+
+/* TEXT */
+h2, h3{
+    margin-top:0;
+}
+
+/* =========================
+   MOBILE FIX (ADDED)
+   ========================= */
+@media (max-width:600px){
+
+    body{
+        flex-direction:column;
+    }
+
+    .left{
+        width:100%;
+        padding:12px;
+    }
+
+    .right{
+        width:100%;
+        height:auto;
+    }
+
+    input,textarea,select{
+        font-size:14px;
+    }
+
+    button{
+        font-size:14px;
+        padding:12px;
+    }
+
+    h2{
+        font-size:18px;
+    }
+
+    h3{
+        font-size:16px;
+    }
 }
 </style>
 </head>
