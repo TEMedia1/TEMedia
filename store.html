@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TEM • Store</title>
 
-<!-- PAYPAL SDK -->
 <script src="https://www.paypal.com/sdk/js?client-id=YOUR_CLIENT_ID&currency=AUD"></script>
 
 <style>
@@ -23,101 +22,91 @@ header{
     color:white;
     padding:10px 14px;
     display:flex;
-    align-items:center;
     justify-content:space-between;
-    z-index:10;
-    box-shadow:0 2px 10px rgba(0,0,0,0.15);
-}
-
-.logo img{
-    height:32px;
-    border-radius:6px;
+    align-items:center;
 }
 
 .title{
-    position:absolute;
-    left:50%;
-    transform:translateX(-50%);
-    font-weight:700;
-    font-size:16px;
-}
-
-.nav{
-    display:flex;
-    gap:10px;
-    font-size:13px;
-}
-
-.nav a{
-    color:white;
-    text-decoration:none;
+    font-weight:bold;
 }
 
 /* STORE */
 .feed{
-    max-width:600px;
+    max-width:650px;
     margin:20px auto;
     padding:10px;
 }
 
-/* CARD */
+/* PRODUCT CARD */
 .card{
     background:white;
     padding:12px;
-    margin-bottom:10px;
+    margin-bottom:12px;
     border-radius:12px;
-    border:1px solid #e6e8ec;
-    box-shadow:0 1px 6px rgba(0,0,0,0.05);
+    box-shadow:0 1px 6px rgba(0,0,0,0.08);
 }
 
-h2{
-    margin:0 0 5px 0;
-    font-size:16px;
-}
-
-p{
-    margin:5px 0;
-    font-size:14px;
-}
-
-.price{
-    font-weight:bold;
-    margin-top:6px;
-}
-
-img{
+.card img{
     width:100%;
     border-radius:10px;
-    margin-top:8px;
-    border:1px solid #e5e7eb;
 }
 
-.badge{
-    background:#dc2626;
+/* ✅ ADD TO CART BUTTON (FIXED + BIG + CLEAR) */
+.add-btn{
+    width:100%;
+    padding:12px;
+    margin-top:10px;
+    border:none;
+    border-radius:10px;
+    background:#16a34a;
     color:white;
-    padding:3px 7px;
-    font-size:10px;
-    border-radius:5px;
-    display:inline-block;
-    margin-bottom:6px;
-    font-weight:600;
+    font-weight:bold;
+    font-size:14px;
+    cursor:pointer;
 }
 
-/* MOBILE */
-@media (max-width:600px){
-    header{flex-wrap:wrap;}
-    .title{
-        position:static;
-        transform:none;
-        width:100%;
-        text-align:center;
-        margin-top:6px;
-    }
-    .nav{
-        width:100%;
-        justify-content:center;
-        flex-wrap:wrap;
-    }
+.add-btn:hover{
+    background:#15803d;
+}
+
+/* CART */
+.cart{
+    position:fixed;
+    right:10px;
+    top:80px;
+    width:280px;
+    background:white;
+    border-radius:12px;
+    padding:12px;
+    box-shadow:0 5px 20px rgba(0,0,0,0.2);
+}
+
+.cart h3{
+    margin:0 0 10px 0;
+}
+
+.cart-item{
+    display:flex;
+    justify-content:space-between;
+    font-size:13px;
+    margin-bottom:5px;
+}
+
+.total{
+    margin-top:10px;
+    font-weight:bold;
+}
+
+/* CLEAR BUTTON */
+.clear-btn{
+    width:100%;
+    margin-top:8px;
+    padding:10px;
+    border:none;
+    border-radius:10px;
+    background:#111827;
+    color:white;
+    cursor:pointer;
 }
 </style>
 </head>
@@ -125,80 +114,111 @@ img{
 <body>
 
 <header>
-    <div class="logo">
-        <img src="TEM1.jpg">
-    </div>
-
-    <div class="title">TEM • STORE</div>
-
-    <div class="nav">
-        <a href="index.html">Main</a>
-        <a href="store.html">Store</a>
-        <a href="page3.html">Page 3</a>
-        <a href="page4.html">Page 4</a>
-        <a href="page5.html">Page 5</a>
-    </div>
+    <div>TEM • STORE</div>
 </header>
 
+<!-- CART -->
+<div class="cart">
+    <h3>🛒 Cart</h3>
+
+    <div id="cart-items"></div>
+    <div class="total" id="cart-total">Total: $0 AUD</div>
+
+    <div id="paypal-button"></div>
+
+    <button class="clear-btn" onclick="clearCart()">Clear Cart</button>
+</div>
+
+<!-- PRODUCTS -->
 <div class="feed">
 
-    <!-- PRODUCT 1 -->
     <div class="card">
-        <div class="badge">COMING SOON</div>
-        <h2>TEM Shirt (Sample)</h2>
-        <p>Emergency media merch test item.</p>
+        <h2>TEM Shirt</h2>
+        <p>$10 AUD</p>
         <img src="TEM1.jpg">
-        <p class="price">$10.00 AUD</p>
-        <div id="paypal-button-1"></div>
+        <button class="add-btn" onclick="addToCart('TEM Shirt', 10)">
+            ➕ ADD TO CART
+        </button>
     </div>
 
-    <!-- PRODUCT 2 -->
     <div class="card">
-        <div class="badge">COMING SOON</div>
         <h2>TEM Sticker Pack</h2>
-        <p>More items will be added soon.</p>
+        <p>$15 AUD</p>
         <img src="TEM1.jpg">
-        <p class="price">$15.00 AUD</p>
-        <div id="paypal-button-2"></div>
+        <button class="add-btn" onclick="addToCart('Sticker Pack', 15)">
+            ➕ ADD TO CART
+        </button>
     </div>
 
-    <!-- PRODUCT 3 -->
     <div class="card">
-        <div class="badge">COMING SOON</div>
         <h2>TEM Hoodie</h2>
-        <p>More items will be added soon.</p>
+        <p>$25 AUD</p>
         <img src="TEM1.jpg">
-        <p class="price">$25.00 AUD</p>
-        <div id="paypal-button-3"></div>
+        <button class="add-btn" onclick="addToCart('Hoodie', 25)">
+            ➕ ADD TO CART
+        </button>
     </div>
 
 </div>
 
-<!-- PAYPAL BUTTON SCRIPT -->
 <script>
-function createPayPalButton(id, amount) {
+let cart = [];
+
+function addToCart(name, price){
+    cart.push({name, price});
+    updateCart();
+}
+
+function clearCart(){
+    cart = [];
+    updateCart();
+}
+
+function updateCart(){
+    let items = document.getElementById("cart-items");
+    let total = 0;
+
+    items.innerHTML = "";
+
+    cart.forEach(item => {
+        total += item.price;
+
+        items.innerHTML += `
+            <div class="cart-item">
+                <span>${item.name}</span>
+                <span>$${item.price}</span>
+            </div>
+        `;
+    });
+
+    document.getElementById("cart-total").innerText =
+        "Total: $" + total + " AUD";
+
+    renderPayPal(total);
+}
+
+function renderPayPal(total){
+    document.getElementById("paypal-button").innerHTML = "";
+
+    if(total <= 0) return;
+
     paypal.Buttons({
-        createOrder: function(data, actions) {
+        createOrder: function(data, actions){
             return actions.order.create({
                 purchase_units: [{
-                    amount: {
-                        value: amount
-                    }
+                    amount: { value: total.toFixed(2) }
                 }]
             });
         },
 
-        onApprove: function(data, actions) {
-            return actions.order.capture().then(function(details) {
+        onApprove: function(data, actions){
+            return actions.order.capture().then(function(details){
                 alert("Payment successful! Thanks " + details.payer.name.given_name);
+                clearCart();
             });
         }
-    }).render(id);
+    }).render("#paypal-button");
 }
-
-createPayPalButton("#paypal-button-1", "10.00");
-createPayPalButton("#paypal-button-2", "15.00");
-createPayPalButton("#paypal-button-3", "25.00");
 </script>
 
 </body>
