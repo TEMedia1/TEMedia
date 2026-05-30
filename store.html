@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TEM • Store</title>
 
+<!-- PAYPAL SDK -->
+<script src="https://www.paypal.com/sdk/js?client-id=YOUR_CLIENT_ID&currency=AUD"></script>
+
 <style>
 body{
     font-family: Arial, sans-serif;
@@ -12,7 +15,7 @@ body{
     background:#f4f6f9;
 }
 
-/* HEADER (same style as home page) */
+/* HEADER */
 header{
     position:sticky;
     top:0;
@@ -37,7 +40,6 @@ header{
     transform:translateX(-50%);
     font-weight:700;
     font-size:16px;
-    white-space:nowrap;
 }
 
 .nav{
@@ -51,14 +53,14 @@ header{
     text-decoration:none;
 }
 
-/* STORE FEED STYLE */
+/* STORE */
 .feed{
     max-width:600px;
     margin:20px auto;
     padding:10px;
 }
 
-/* PRODUCT CARD */
+/* CARD */
 .card{
     background:white;
     padding:12px;
@@ -76,29 +78,13 @@ h2{
 p{
     margin:5px 0;
     font-size:14px;
-    line-height:1.35;
 }
 
 .price{
     font-weight:bold;
-    font-size:14px;
     margin-top:6px;
 }
 
-/* BUTTON */
-button{
-    width:100%;
-    padding:10px;
-    margin-top:10px;
-    border:none;
-    border-radius:10px;
-    background:#dc2626;
-    color:white;
-    font-weight:bold;
-    cursor:pointer;
-}
-
-/* IMAGE */
 img{
     width:100%;
     border-radius:10px;
@@ -106,7 +92,6 @@ img{
     border:1px solid #e5e7eb;
 }
 
-/* BADGE */
 .badge{
     background:#dc2626;
     color:white;
@@ -118,62 +103,20 @@ img{
     font-weight:600;
 }
 
-/* =========================
-   MOBILE FIX (ADDED)
-   ========================= */
+/* MOBILE */
 @media (max-width:600px){
-
-    header{
-        flex-wrap:wrap;
-        padding:10px;
-    }
-
-    .logo img{
-        height:26px;
-    }
-
+    header{flex-wrap:wrap;}
     .title{
         position:static;
         transform:none;
         width:100%;
         text-align:center;
         margin-top:6px;
-        font-size:14px;
     }
-
     .nav{
         width:100%;
         justify-content:center;
         flex-wrap:wrap;
-        font-size:12px;
-        gap:6px;
-        margin-top:6px;
-    }
-
-    .feed{
-        padding:10px;
-        max-width:100%;
-        margin:10px auto;
-    }
-
-    .card{
-        padding:10px;
-    }
-
-    h2{
-        font-size:15px;
-    }
-
-    p{
-        font-size:13px;
-    }
-
-    .price{
-        font-size:13px;
-    }
-
-    button{
-        padding:9px;
     }
 }
 </style>
@@ -199,34 +142,64 @@ img{
 
 <div class="feed">
 
+    <!-- PRODUCT 1 -->
     <div class="card">
         <div class="badge">COMING SOON</div>
-        <h2>N/Ar</h2>
-        <p>Emergency media merch / products will appear here.</p>
+        <h2>TEM Shirt (Sample)</h2>
+        <p>Emergency media merch test item.</p>
         <img src="TEM1.jpg">
-        <p class="price">$0.00 AUD</p>
-        <button>Buy Now</button>
+        <p class="price">$10.00 AUD</p>
+        <div id="paypal-button-1"></div>
     </div>
 
+    <!-- PRODUCT 2 -->
     <div class="card">
         <div class="badge">COMING SOON</div>
-        <h2>N/Ar</h2>
+        <h2>TEM Sticker Pack</h2>
         <p>More items will be added soon.</p>
         <img src="TEM1.jpg">
-        <p class="price">$0.00 AUD</p>
-        <button>Buy Now</button>
+        <p class="price">$15.00 AUD</p>
+        <div id="paypal-button-2"></div>
     </div>
 
+    <!-- PRODUCT 3 -->
     <div class="card">
         <div class="badge">COMING SOON</div>
-        <h2>N/Ar</h2>
+        <h2>TEM Hoodie</h2>
         <p>More items will be added soon.</p>
         <img src="TEM1.jpg">
-        <p class="price">$0.00 AUD</p>
-        <button>Buy Now</button>
+        <p class="price">$25.00 AUD</p>
+        <div id="paypal-button-3"></div>
     </div>
 
 </div>
+
+<!-- PAYPAL BUTTON SCRIPT -->
+<script>
+function createPayPalButton(id, amount) {
+    paypal.Buttons({
+        createOrder: function(data, actions) {
+            return actions.order.create({
+                purchase_units: [{
+                    amount: {
+                        value: amount
+                    }
+                }]
+            });
+        },
+
+        onApprove: function(data, actions) {
+            return actions.order.capture().then(function(details) {
+                alert("Payment successful! Thanks " + details.payer.name.given_name);
+            });
+        }
+    }).render(id);
+}
+
+createPayPalButton("#paypal-button-1", "10.00");
+createPayPalButton("#paypal-button-2", "15.00");
+createPayPalButton("#paypal-button-3", "25.00");
+</script>
 
 </body>
 </html>
