@@ -6,32 +6,67 @@
 <style>
 body{
     font-family: system-ui, Arial, sans-serif;
-    background:#0b1220;
-    color:#e5e7eb;
     margin:0;
+    background:#f3f4f6;
+    color:#111827;
+}
+
+/* TOP BAR */
+.topbar{
+    height:55px;
+    background:#0f172a;
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 16px;
+    position:sticky;
+    top:0;
+    z-index:20;
+}
+
+.topbar h1{
+    font-size:16px;
+    margin:0;
+}
+
+.topbar button{
+    background:#dc2626;
+    border:none;
+    color:white;
+    padding:8px 10px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+/* MAIN LAYOUT */
+.container{
     display:flex;
 }
 
-/* LEFT PANEL */
+/* LEFT */
 .left{
     width:70%;
-    padding:24px;
+    padding:20px;
 }
 
-/* RIGHT PANEL */
+/* RIGHT PANEL (hidden drawer style) */
 .right{
-    width:30%;
-    background:#0f172a;
-    padding:18px;
-    height:100vh;
+    width:320px;
+    background:white;
+    position:fixed;
+    right:-340px;
+    top:55px;
+    height:calc(100vh - 55px);
     overflow:auto;
-    border-left:1px solid #1f2937;
+    box-shadow:-10px 0 30px rgba(0,0,0,0.1);
+    transition:0.3s;
+    padding:15px;
+    z-index:15;
 }
 
-/* HEADINGS */
-h2,h3{
-    margin:0 0 12px 0;
-    font-weight:700;
+.right.open{
+    right:0;
 }
 
 /* INPUTS */
@@ -39,90 +74,82 @@ input,textarea,select{
     width:100%;
     padding:10px;
     margin-bottom:10px;
-    border-radius:10px;
-    border:1px solid #1f2937;
-    background:#111827;
-    color:white;
-    outline:none;
-}
-
-input:focus,textarea:focus,select:focus{
-    border-color:#dc2626;
+    border-radius:8px;
+    border:1px solid #d1d5db;
+    background:white;
 }
 
 /* BUTTON */
-button{
+button.main{
     width:100%;
-    padding:11px;
+    padding:10px;
     border:none;
-    border-radius:10px;
+    border-radius:8px;
     background:#dc2626;
     color:white;
-    font-weight:700;
+    font-weight:bold;
     cursor:pointer;
-    transition:0.2s;
-}
-
-button:hover{
-    background:#b91c1c;
 }
 
 /* CARD */
 .card{
-    background:#111827;
-    border:1px solid #1f2937;
+    background:white;
     padding:12px;
+    border-radius:10px;
+    border:1px solid #e5e7eb;
     margin-bottom:10px;
-    border-radius:12px;
 }
 
-/* POST LIST BUTTON */
-.card button{
-    margin-top:8px;
-    background:#374151;
+/* LOG BUTTON */
+.logToggle{
+    position:fixed;
+    right:15px;
+    bottom:15px;
+    background:#0f172a;
+    color:white;
+    border:none;
+    padding:10px 12px;
+    border-radius:50px;
+    cursor:pointer;
+    z-index:30;
 }
 
-.card button:hover{
-    background:#4b5563;
-}
-
-/* LABEL */
-label{
+/* LOCK SCREEN */
+.lock{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:#0f172a;
     display:flex;
     align-items:center;
-    gap:8px;
-    margin-bottom:10px;
-    font-size:14px;
+    justify-content:center;
+    z-index:100;
 }
 
-/* SCROLLBAR (nice touch) */
-.right::-webkit-scrollbar{
-    width:6px;
-}
-.right::-webkit-scrollbar-thumb{
-    background:#374151;
-    border-radius:10px;
+.lockBox{
+    background:white;
+    padding:20px;
+    border-radius:12px;
+    width:300px;
 }
 
-/* =========================
-   MOBILE
-   ========================= */
-@media (max-width:600px){
+.lockBox input{
+    width:100%;
+    padding:10px;
+    margin-top:10px;
+}
 
-    body{
-        flex-direction:column;
-    }
-
+/* MOBILE */
+@media (max-width:700px){
     .left{
         width:100%;
-        padding:16px;
+        padding:15px;
     }
 
     .right{
         width:100%;
-        height:auto;
-        border-left:none;
-        border-top:1px solid #1f2937;
     }
 }
 </style>
@@ -130,14 +157,33 @@ label{
 
 <body>
 
+<!-- LOCK SCREEN -->
+<div class="lock" id="lock">
+    <div class="lockBox">
+        <h3>Staff Login</h3>
+        <p>Enter access code</p>
+        <input id="pass" placeholder="Password">
+        <button class="main" onclick="unlock()">Enter</button>
+    </div>
+</div>
+
+<!-- TOP BAR -->
+<div class="topbar">
+    <h1>Staff Control Panel</h1>
+    <button onclick="toggleLogs()">Logs</button>
+</div>
+
+<div class="container">
+
+<!-- LEFT -->
 <div class="left">
 
-<h2>Staff Panel</h2>
+<h2>Post System</h2>
 
 <input id="title" placeholder="Title">
 <textarea id="desc" placeholder="Description"></textarea>
 
-<input id="location" placeholder="Location (e.g. Hobart)">
+<input id="location" placeholder="Location">
 
 <select id="category">
 <option>Fire</option>
@@ -152,19 +198,25 @@ label{
 <input type="checkbox" id="emergency"> Emergency Mode
 </label>
 
-<button onclick="post()">Post</button>
+<button class="main" onclick="post()">Post</button>
 
-<hr style="border:1px solid #1f2937; margin:20px 0;">
+<hr>
 
 <h3>Posts</h3>
 <div id="posts"></div>
 
 </div>
 
-<div class="right">
+<!-- LOGS DRAWER -->
+<div class="right" id="logsPanel">
 <h3>Logs</h3>
 <div id="logs"></div>
 </div>
+
+</div>
+
+<!-- FLOAT LOG BUTTON -->
+<button class="logToggle" onclick="toggleLogs()">Logs</button>
 
 <script type="module">
 
@@ -201,6 +253,21 @@ const db = getFirestore(app);
 const storage = getStorage(app);
 
 const user = sessionStorage.getItem("staffUser");
+
+/* LOCK */
+window.unlock = function(){
+    const pass = document.getElementById("pass").value;
+    if(pass === "T4M26"){
+        document.getElementById("lock").style.display="none";
+    } else {
+        alert("Wrong code");
+    }
+}
+
+/* LOGS TOGGLE */
+window.toggleLogs = function(){
+    document.getElementById("logsPanel").classList.toggle("open");
+}
 
 /* LOG */
 async function log(action,text){
