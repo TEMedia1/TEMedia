@@ -51,14 +51,14 @@ header{
     text-decoration:none;
 }
 
-/* STORE FEED STYLE (like your home page) */
+/* STORE FEED STYLE */
 .feed{
     max-width:600px;
     margin:20px auto;
     padding:10px;
 }
 
-/* PRODUCT CARD (same system as posts) */
+/* PRODUCT CARD */
 .card{
     background:white;
     padding:12px;
@@ -68,20 +68,17 @@ header{
     box-shadow:0 1px 6px rgba(0,0,0,0.05);
 }
 
-/* TITLE */
 h2{
     margin:0 0 5px 0;
     font-size:16px;
 }
 
-/* TEXT */
 p{
     margin:5px 0;
     font-size:14px;
     line-height:1.35;
 }
 
-/* PRICE */
 .price{
     font-weight:bold;
     font-size:14px;
@@ -121,19 +118,62 @@ img{
     font-weight:600;
 }
 
-/* PHONE OPTIMISATION */
+/* =========================
+   MOBILE FIX (ADDED)
+   ========================= */
 @media (max-width:600px){
-    .feed{
-        padding:12px;
+
+    header{
+        flex-wrap:wrap;
+        padding:10px;
+    }
+
+    .logo img{
+        height:26px;
     }
 
     .title{
+        position:static;
+        transform:none;
+        width:100%;
+        text-align:center;
+        margin-top:6px;
         font-size:14px;
     }
 
     .nav{
-        font-size:11px;
+        width:100%;
+        justify-content:center;
+        flex-wrap:wrap;
+        font-size:12px;
         gap:6px;
+        margin-top:6px;
+    }
+
+    .feed{
+        padding:10px;
+        max-width:100%;
+        margin:10px auto;
+    }
+
+    .card{
+        padding:10px;
+    }
+
+    h2{
+        font-size:15px;
+    }
+
+    p{
+        font-size:13px;
+    }
+
+    .price{
+        font-size:13px;
+    }
+
+    button{
+        padding:9px;
     }
 }
 </style>
