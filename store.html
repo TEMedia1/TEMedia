@@ -5,14 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TEM • Store</title>
 
+<!-- PAYPAL -->
 <script src="https://www.paypal.com/sdk/js?client-id=YOUR_CLIENT_ID&currency=AUD"></script>
+
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore-compat.js"></script>
 
 <style>
 body{
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
     margin:0;
     background:#f5f6f8;
-    color:#111827;
+    color:#111;
 }
 
 /* HEADER */
@@ -22,25 +27,17 @@ header{
     background:#0b1220;
     color:white;
     padding:14px 18px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    border-bottom:1px solid rgba(255,255,255,0.08);
-}
-
-header div{
     font-weight:600;
-    letter-spacing:0.5px;
 }
 
-/* STORE LAYOUT */
+/* LAYOUT */
 .feed{
-    max-width:720px;
-    margin:30px auto;
-    padding:0 14px;
+    max-width:700px;
+    margin:20px auto;
+    padding:10px;
 }
 
-/* PRODUCT CARD */
+/* CARD */
 .card{
     background:white;
     padding:16px;
@@ -52,35 +49,29 @@ header div{
 .card h2{
     margin:0;
     font-size:16px;
-    font-weight:600;
 }
 
 .card p{
-    margin:6px 0;
     color:#6b7280;
     font-size:14px;
 }
 
+/* IMAGE */
 .card img{
     width:100%;
     border-radius:12px;
-    margin-top:10px;
-    border:1px solid #eef0f3;
 }
 
-/* PROFESSIONAL BUTTON */
+/* BUTTON */
 .add-btn{
     width:100%;
-    margin-top:12px;
-    padding:10px 12px;
+    margin-top:10px;
+    padding:10px;
     border:1px solid #111827;
-    background:transparent;
-    color:#111827;
+    background:white;
+    cursor:pointer;
     border-radius:10px;
     font-weight:500;
-    font-size:14px;
-    cursor:pointer;
-    transition:0.2s ease;
 }
 
 .add-btn:hover{
@@ -91,7 +82,7 @@ header div{
 /* CART */
 .cart{
     position:fixed;
-    right:16px;
+    right:15px;
     top:80px;
     width:300px;
     background:white;
@@ -102,39 +93,31 @@ header div{
 }
 
 .cart h3{
-    margin:0 0 12px 0;
-    font-size:14px;
-    font-weight:600;
-    color:#111827;
+    margin:0 0 10px 0;
 }
 
 .cart-item{
     display:flex;
     justify-content:space-between;
     font-size:13px;
-    padding:4px 0;
-    color:#374151;
+    padding:3px 0;
 }
 
 .total{
     margin-top:10px;
     font-weight:600;
-    font-size:14px;
     border-top:1px solid #e5e7eb;
     padding-top:10px;
 }
 
-/* CLEAR BUTTON */
 .clear-btn{
     width:100%;
     margin-top:10px;
     padding:10px;
     border:1px solid #e5e7eb;
     background:#f9fafb;
-    color:#111827;
-    border-radius:10px;
-    font-size:13px;
     cursor:pointer;
+    border-radius:10px;
 }
 
 .clear-btn:hover{
@@ -145,14 +128,11 @@ header div{
 
 <body>
 
-<header>
-    <div>TEM • STORE</div>
-</header>
+<header>TEM • STORE</header>
 
 <!-- CART -->
 <div class="cart">
     <h3>Cart</h3>
-
     <div id="cart-items"></div>
     <div class="total" id="cart-total">Total: $0 AUD</div>
 
@@ -165,28 +145,28 @@ header div{
 <div class="feed">
 
     <div class="card">
-        <h2>TEM</h2>
-        <p>$0 AUD</p>
+        <h2>TEM Shirt</h2>
+        <p>$10 AUD</p>
         <img src="TEM1.jpg">
-        <button class="add-btn" onclick="addToCart('TEM ', 0)">
+        <button class="add-btn" onclick="addToCart('TEM Shirt', 10)">
             Add to Cart
         </button>
     </div>
 
     <div class="card">
-        <h2>TEM  </h2>
-        <p>$0 </p>
+        <h2>TEM Sticker Pack</h2>
+        <p>$15 AUD</p>
         <img src="TEM1.jpg">
-        <button class="add-btn" onclick="addToCart('TEM ', 0)">
+        <button class="add-btn" onclick="addToCart('Sticker Pack', 15)">
             Add to Cart
         </button>
     </div>
 
     <div class="card">
-        <h2>TEM </h2>
-        <p>$0 </p>
+        <h2>TEM Hoodie</h2>
+        <p>$25 AUD</p>
         <img src="TEM1.jpg">
-        <button class="add-btn" onclick="addToCart('TEM', 0)">
+        <button class="add-btn" onclick="addToCart('Hoodie', 25)">
             Add to Cart
         </button>
     </div>
@@ -196,6 +176,7 @@ header div{
 <script>
 let cart = [];
 
+/* CART SYSTEM */
 function addToCart(name, price){
     cart.push({name, price});
     updateCart();
@@ -229,6 +210,7 @@ function updateCart(){
     renderPayPal(total);
 }
 
+/* PAYPAL */
 function renderPayPal(total){
     document.getElementById("paypal-button").innerHTML = "";
 
@@ -245,12 +227,37 @@ function renderPayPal(total){
 
         onApprove: function(data, actions){
             return actions.order.capture().then(function(details){
-                alert("Payment successful. Thank you " + details.payer.name.given_name);
+
+                // SAVE TO FIREBASE
+                db.collection("orders").add({
+                    name: details.payer.name.given_name || "unknown",
+                    email: details.payer.email_address || "unknown",
+                    items: cart,
+                    total: cart.reduce((sum, i) => sum + i.price, 0),
+                    time: new Date().toISOString()
+                });
+
+                alert("Payment successful. Thanks " + details.payer.name.given_name);
                 clearCart();
             });
         }
     }).render("#paypal-button");
 }
+</script>
+
+<!-- FIREBASE INIT -->
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyC9ZGC-lCJopRcl5VX-jyFbnz00Yvq82r0",
+  authDomain: "tem-store.firebaseapp.com",
+  projectId: "tem-store",
+  storageBucket: "tem-store.firebasestorage.app",
+  messagingSenderId: "519532252547",
+  appId: "1:519532252547:web:29ee394b78d5b4917c3ab6"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 </script>
 
 </body>
