@@ -5,34 +5,60 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TEM • Store</title>
 
-<!-- PAYPAL -->
-<script src="https://www.paypal.com/sdk/js?client-id=YOUR_CLIENT_ID&currency=AUD"></script>
-
-<!-- FIREBASE -->
-<script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore-compat.js"></script>
-
 <style>
 body{
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    font-family: Arial, sans-serif;
     margin:0;
-    background:#f5f6f8;
-    color:#111;
+    background:#f4f6f9;
+    color:#1a1a1a;
 }
 
 /* HEADER */
 header{
     position:sticky;
     top:0;
-    background:#0b1220;
+    background:#0f172a;
     color:white;
-    padding:14px 18px;
-    font-weight:600;
+    padding:10px 14px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    z-index:10;
+    box-shadow:0 2px 10px rgba(0,0,0,0.15);
 }
 
-/* LAYOUT */
+/* LOGO */
+.logo img{
+    height:32px;
+    border-radius:6px;
+}
+
+/* CENTER TITLE */
+.title{
+    position:absolute;
+    left:50%;
+    transform:translateX(-50%);
+    font-weight:700;
+    font-size:16px;
+    white-space:nowrap;
+}
+
+/* NAV */
+.nav{
+    display:flex;
+    gap:10px;
+    font-size:13px;
+    align-items:center;
+}
+
+.nav a{
+    color:white;
+    text-decoration:none;
+}
+
+/* FEED (CENTERED LIKE NEWS SITE) */
 .feed{
-    max-width:700px;
+    max-width:600px;
     margin:20px auto;
     padding:10px;
 }
@@ -40,225 +66,146 @@ header{
 /* CARD */
 .card{
     background:white;
-    padding:16px;
-    margin-bottom:14px;
-    border-radius:14px;
-    border:1px solid #e5e7eb;
+    padding:12px;
+    margin-bottom:10px;
+    border-radius:12px;
+    border:1px solid #e6e8ec;
+    box-shadow:0 1px 6px rgba(0,0,0,0.05);
 }
 
-.card h2{
-    margin:0;
+.card:active{
+    transform:scale(0.99);
+}
+
+/* EMERGENCY */
+.emergency{
+    border-left:4px solid #dc2626;
+}
+
+/* TEXT */
+h2{
+    margin:0 0 5px 0;
     font-size:16px;
 }
 
-.card p{
-    color:#6b7280;
+p{
+    margin:5px 0;
     font-size:14px;
+    line-height:1.35;
+}
+
+/* META */
+.meta{
+    font-size:11px;
+    color:#6b7280;
+}
+
+/* BADGE */
+.badge{
+    background:#dc2626;
+    color:white;
+    padding:3px 7px;
+    font-size:10px;
+    border-radius:5px;
+    display:inline-block;
+    margin-bottom:6px;
+    font-weight:600;
 }
 
 /* IMAGE */
-.card img{
+img{ 
     width:100%;
-    border-radius:12px;
-}
-
-/* BUTTON */
-.add-btn{
-    width:100%;
-    margin-top:10px;
-    padding:10px;
-    border:1px solid #111827;
-    background:white;
-    cursor:pointer;
     border-radius:10px;
-    font-weight:500;
-}
-
-.add-btn:hover{
-    background:#111827;
-    color:white;
-}
-
-/* CART */
-.cart{
-    position:fixed;
-    right:15px;
-    top:80px;
-    width:300px;
-    background:white;
+    margin-top:8px;
     border:1px solid #e5e7eb;
-    border-radius:14px;
-    padding:14px;
-    box-shadow:0 10px 30px rgba(0,0,0,0.08);
 }
 
-.cart h3{
-    margin:0 0 10px 0;
-}
+/* =========================
+   MOBILE FIX (ADDED)
+   ========================= */
+@media (max-width: 600px) {
 
-.cart-item{
-    display:flex;
-    justify-content:space-between;
-    font-size:13px;
-    padding:3px 0;
-}
+    header{
+        flex-wrap:wrap;
+        padding:10px;
+    }
 
-.total{
-    margin-top:10px;
-    font-weight:600;
-    border-top:1px solid #e5e7eb;
-    padding-top:10px;
-}
+    .logo img{
+        height:26px;
+    }
 
-.clear-btn{
-    width:100%;
-    margin-top:10px;
-    padding:10px;
-    border:1px solid #e5e7eb;
-    background:#f9fafb;
-    cursor:pointer;
-    border-radius:10px;
-}
+    .title{
+        position:static;
+        transform:none;
+        width:100%;
+        text-align:center;
+        margin-top:6px;
+        font-size:14px;
+    }
 
-.clear-btn:hover{
-    background:#f3f4f6;
+    .nav{
+        width:100%;
+        justify-content:center;
+        flex-wrap:wrap;
+        font-size:12px;
+        gap:6px;
+        margin-top:6px;
+    }
+
+    .nav span{
+        display:none;
+    }
+
+    .feed{
+        margin:10px auto;
+        padding:8px;
+        max-width:100%;
+    }
+
+    .card{
+        padding:10px;
+    }
+
+    h2{
+        font-size:15px;
+    }
+
+    p{
+        font-size:13px;
+    }
+
+    .meta{
+        font-size:10px;
+    }
 }
 </style>
 </head>
 
 <body>
 
-<header>TEM • STORE</header>
-
-<!-- CART -->
-<div class="cart">
-    <h3>Cart</h3>
-    <div id="cart-items"></div>
-    <div class="total" id="cart-total">Total: $0 AUD</div>
-
-    <div id="paypal-button" style="margin-top:10px;"></div>
-
-    <button class="clear-btn" onclick="clearCart()">Clear Cart</button>
-</div>
-
-<!-- PRODUCTS -->
-<div class="feed">
-
-    <div class="card">
-        <h2>TEM Shirt</h2>
-        <p>$10 AUD</p>
+<header>
+    <div class="logo">
         <img src="TEM1.jpg">
-        <button class="add-btn" onclick="addToCart('TEM Shirt', 10)">
-            Add to Cart
-        </button>
     </div>
 
-    <div class="card">
-        <h2>TEM Sticker Pack</h2>
-        <p>$15 AUD</p>
-        <img src="TEM1.jpg">
-        <button class="add-btn" onclick="addToCart('Sticker Pack', 15)">
-            Add to Cart
-        </button>
+    <div class="title">
+        TEM • STORE
     </div>
 
-    <div class="card">
-        <h2>TEM Hoodie</h2>
-        <p>$25 AUD</p>
-        <img src="TEM1.jpg">
-        <button class="add-btn" onclick="addToCart('Hoodie', 25)">
-            Add to Cart
-        </button>
+    <div class="nav">
+        <a href="index.html">Main</a>
+        <span>•</span>
+        <a href="store.html">Store</a>
+        <span>•</span>
+        <a href="page3.html">Page 3</a>
+        <span>•</span>
+        <a href="page4.html">Page 4</a>
+        <span>•</span>
+        <a href="page5.html">Page 5</a>
     </div>
+</header>
 
-</div>
-
-<script>
-let cart = [];
-
-/* CART SYSTEM */
-function addToCart(name, price){
-    cart.push({name, price});
-    updateCart();
-}
-
-function clearCart(){
-    cart = [];
-    updateCart();
-}
-
-function updateCart(){
-    let items = document.getElementById("cart-items");
-    let total = 0;
-
-    items.innerHTML = "";
-
-    cart.forEach(item => {
-        total += item.price;
-
-        items.innerHTML += `
-            <div class="cart-item">
-                <span>${item.name}</span>
-                <span>$${item.price}</span>
-            </div>
-        `;
-    });
-
-    document.getElementById("cart-total").innerText =
-        "Total: $" + total + " AUD";
-
-    renderPayPal(total);
-}
-
-/* PAYPAL */
-function renderPayPal(total){
-    document.getElementById("paypal-button").innerHTML = "";
-
-    if(total <= 0) return;
-
-    paypal.Buttons({
-        createOrder: function(data, actions){
-            return actions.order.create({
-                purchase_units: [{
-                    amount: { value: total.toFixed(2) }
-                }]
-            });
-        },
-
-        onApprove: function(data, actions){
-            return actions.order.capture().then(function(details){
-
-                // SAVE TO FIREBASE
-                db.collection("orders").add({
-                    name: details.payer.name.given_name || "unknown",
-                    email: details.payer.email_address || "unknown",
-                    items: cart,
-                    total: cart.reduce((sum, i) => sum + i.price, 0),
-                    time: new Date().toISOString()
-                });
-
-                alert("Payment successful. Thanks " + details.payer.name.given_name);
-                clearCart();
-            });
-        }
-    }).render("#paypal-button");
-}
-</script>
-
-<!-- FIREBASE INIT -->
-<script>
-const firebaseConfig = {
-  apiKey: "AIzaSyC9ZGC-lCJopRcl5VX-jyFbnz00Yvq82r0",
-  authDomain: "tem-store.firebaseapp.com",
-  projectId: "tem-store",
-  storageBucket: "tem-store.firebasestorage.app",
-  messagingSenderId: "519532252547",
-  appId: "1:519532252547:web:29ee394b78d5b4917c3ab6"
-};
-
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-</script>
+<div class="feed" id="feed"></div>
 
 </body>
 </html>
