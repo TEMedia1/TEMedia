@@ -252,8 +252,8 @@ onSnapshot(q,(snap)=>{
             <h2>${d.title || ""}</h2>
             <p>${d.desc || ""}</p>
 
-            ${d.location ? `<p class="meta">📍 ${d.location}</p>` : ""}
-            ${d.category ? `<p class="meta">🚨 ${d.category}</p>` : ""}
+            ${d.location ? `<p class="meta"> ${d.location}</p>` : ""}
+            ${d.category ? `<p class="meta"> ${d.category}</p>` : ""}
 
             ${d.image ? `<img src="${d.image}">` : ""}
 
