@@ -1,7 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TEM • Admin</title>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    margin:0;
+    background:#f4f6f9;
+    color:#1a1a1a;
+}
+
+/* HEADER */
+header{
+    position:sticky;
+    top:0;
+    background:#0f172a;
+    color:white;
+    padding:10px 14px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    z-index:10;
+    box-shadow:0 2px 10px rgba(0,0,0,0.15);
+}
+
+.logo img{height:32px;border-radius:6px;}
+
+.title{
+    position:absolute;
+    left:50%;
+    transform:translateX(-50%);
+    font-weight:700;
+    font-size:16px;
+}
+
+.nav{
+    display:flex;
+    gap:10px;
+    font-size:13px;
+}
+
+.nav a{
+    color:white;
+    text-decoration:none;
+}
+
+/* LAYOUT */
+.feed{
+    max-width:1100px;
+    margin:20px auto;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+    padding:10px;
+}
+
+.left,.right{
+    background:white;
+    padding:15px;
+    border-radius:12px;
+    border:1px solid #e6e8ec;
+}
+
+/* FORM */
+.left input,
+.left textarea,
+.left select{
+    width:100%;
+    padding:10px;
+    margin-bottom:10px;
+    box-sizing:border-box;
+}
+
+.left textarea{
+    min-height:100px;
+}
+
+.left button{
+    width:100%;
+    padding:10px;
+    background:#0f172a;
+    color:white;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+/* CARDS */
+.card{
+    background:white;
+    padding:12px;
+    margin-bottom:10px;
+    border-radius:12px;
+    border:1px solid #e6e8ec;
+}
+
+/* MOBILE */
+@media(max-width:700px){
+    .feed{
+        grid-template-columns:1fr;
+    }
+
+    .title{
+        position:static;
+        transform:none;
+        text-align:center;
+        width:100%;
+        margin-top:5px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">
+        <img src="TEM1.jpg">
+    </div>
+
+    <div class="title">TEM • Admin</div>
+
+    <div class="nav">
+        <a href="index.html">Main</a>
+        <a href="store.html">Store</a>
+        <a href="page3.html">Page 3</a>
+    </div>
+</header>
+
+<div class="feed">
+
+    <!-- LEFT: STAFF PANEL -->
+    <div class="left">
+
+        <h2>Staff Panel</h2>
+
+        <input id="title" placeholder="Title">
+        <textarea id="desc" placeholder="Description"></textarea>
+
+        <input id="location" placeholder="Location">
+
+        <select id="category">
+            <option>Fire</option>
+            <option>Rescue</option>
+            <option>Traffic</option>
+            <option>General</option>
+        </select>
+
+        <input id="image" type="file">
+
+        <label>
+            <input type="checkbox" id="emergency"> Emergency Mode
+        </label>
+
+        <button onclick="post()">Post</button>
+
+        <hr>
+
+        <h3>Posts</h3>
+        <div id="posts"></div>
+
+    </div>
+
+    <!-- RIGHT: LOGS -->
+    <div class="right">
+        <h3>Logs</h3>
+        <div id="logs"></div>
+    </div>
+
+</div>
+
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-
 import {
     getFirestore,
     collection,
@@ -20,11 +194,12 @@ import {
     getDownloadURL
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
+/* FIREBASE */
 const firebaseConfig = {
     apiKey: "AIzaSyAIqLic00FcNgtuKZATMdHU4jRITnYO2A8",
     authDomain: "temedia20-be031.firebaseapp.com",
     projectId: "temedia20-be031",
-    storageBucket: "temedia20-be031.appspot.com",
+    storageBucket: "temedia20-be031.firebasestorage.app",
     messagingSenderId: "514394139848",
     appId: "1:514394139848:web:7edabb080c12b87bc909fd"
 };
@@ -33,163 +208,114 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const storage = getStorage(app);
 
-const posts = document.getElementById("posts");
-const logs = document.getElementById("logs");
-
+/* LOGIN CHECK */
 const user = sessionStorage.getItem("staffUser");
-
-if (!user) {
-    window.location.href = "login.html";
+if(!user){
+    location.href = "login.html";
 }
 
-/* LOGGING */
-async function log(action, text) {
-    try {
-        await addDoc(collection(db, "logs"), {
-            user,
-            action,
-            text,
-            time: Date.now()
-        });
-    } catch (err) {
-        console.error("Log Error:", err);
-    }
+/* ELEMENTS */
+const postsDiv = document.getElementById("posts");
+const logsDiv = document.getElementById("logs");
+
+/* LOG FUNCTION */
+async function log(action,text){
+    await addDoc(collection(db,"logs"),{
+        user,
+        action,
+        text,
+        time:Date.now()
+    });
 }
 
-/* CREATE POST */
-window.post = async function () {
+/* POST */
+window.post = async function(){
 
-    try {
+    const title = document.getElementById("title").value;
+    const desc = document.getElementById("desc").value;
+    const location = document.getElementById("location").value;
+    const category = document.getElementById("category").value;
+    const emergency = document.getElementById("emergency").checked;
+    const file = document.getElementById("image").files[0];
 
-        const title = document.getElementById("title").value.trim();
-        const desc = document.getElementById("desc").value.trim();
-        const location = document.getElementById("location").value.trim();
-        const category = document.getElementById("category").value;
-        const emergency = document.getElementById("emergency").checked;
+    let imageURL = "";
 
-        if (!title || !desc) {
-            alert("Please enter a title and description.");
-            return;
-        }
-
-        const file = document.getElementById("image").files[0];
-
-        let imageURL = "";
-
-        if (file) {
-
-            const fileName = `${Date.now()}_${file.name}`;
-            const imageRef = ref(storage, `images/${fileName}`);
-
-            await uploadBytes(imageRef, file);
-
-            imageURL = await getDownloadURL(imageRef);
-        }
-
-        await addDoc(collection(db, "posts"), {
-            title,
-            desc,
-            location,
-            category,
-            emergency,
-            image: imageURL,
-            time: Date.now()
-        });
-
-        await log("POSTED", title);
-
-        document.getElementById("title").value = "";
-        document.getElementById("desc").value = "";
-        document.getElementById("location").value = "";
-        document.getElementById("image").value = "";
-        document.getElementById("emergency").checked = false;
-
-        alert("Post published successfully.");
-
-    } catch (err) {
-        console.error("Post Error:", err);
-        alert("Failed to publish post.");
-    }
-};
-
-/* DELETE POST */
-window.del = async function (id, title) {
-
-    if (!confirm(`Delete "${title}"?`)) {
-        return;
+    if(file){
+        const imgRef = ref(storage,"images/"+Date.now());
+        await uploadBytes(imgRef,file);
+        imageURL = await getDownloadURL(imgRef);
     }
 
-    try {
-
-        await deleteDoc(doc(db, "posts", id));
-
-        await log("DELETED", title);
-
-    } catch (err) {
-
-        console.error("Delete Error:", err);
-
-        alert("Failed to delete post.");
-    }
-};
-
-/* LIVE POSTS LIST */
-const postsQuery = query(
-    collection(db, "posts"),
-    orderBy("time", "desc")
-);
-
-onSnapshot(postsQuery, (snapshot) => {
-
-    posts.innerHTML = "";
-
-    snapshot.forEach((docSnap) => {
-
-        const data = docSnap.data();
-
-        posts.innerHTML += `
-            <div class="card">
-                <b>${data.title}</b><br>
-                <small>${data.category}</small><br><br>
-
-                <button onclick="del('${docSnap.id}','${data.title.replace(/'/g, "\\'")}')">
-                    Delete
-                </button>
-            </div>
-        `;
+    await addDoc(collection(db,"posts"),{
+        title,
+        desc,
+        location,
+        category,
+        emergency,
+        image:imageURL,
+        time:Date.now()
     });
 
-}, (error) => {
-    console.error("Posts Listener Error:", error);
+    await log("POSTED",title);
+
+    /* RESET */
+    document.getElementById("title").value = "";
+    document.getElementById("desc").value = "";
+    document.getElementById("location").value = "";
+    document.getElementById("image").value = "";
+    document.getElementById("emergency").checked = false;
+
+    alert("Posted!");
+};
+
+/* DELETE */
+window.del = async function(id,title){
+    await deleteDoc(doc(db,"posts",id));
+    await log("DELETED",title);
+};
+
+/* POSTS LIVE */
+const q1 = query(collection(db,"posts"),orderBy("time","desc"));
+
+onSnapshot(q1,(snap)=>{
+
+    postsDiv.innerHTML="";
+
+    snap.forEach((d)=>{
+
+        const data = d.data();
+
+        postsDiv.innerHTML += `
+        <div class="card">
+            <b>${data.title}</b><br><br>
+            <button onclick="del('${d.id}','${data.title.replace(/'/g,"\\'")}')">
+                Delete
+            </button>
+        </div>
+        `;
+    });
 });
 
-/* LIVE LOGS */
-const logsQuery = query(
-    collection(db, "logs"),
-    orderBy("time", "desc")
-);
+/* LOGS LIVE */
+const q2 = query(collection(db,"logs"),orderBy("time","desc"));
 
-onSnapshot(logsQuery, (snapshot) => {
+onSnapshot(q2,(snap)=>{
 
-    logs.innerHTML = "";
+    logsDiv.innerHTML="";
 
-    snapshot.forEach((docSnap) => {
+    snap.forEach((d)=>{
 
-        const data = docSnap.data();
+        const l = d.data();
 
-        const date = new Date(data.time).toLocaleString();
-
-        logs.innerHTML += `
-            <div class="card">
-                <b>${data.user || "Unknown"}</b><br>
-                ${data.action}: ${data.text}<br>
-                <small>${date}</small>
-            </div>
+        logsDiv.innerHTML += `
+        <div class="card">
+            [${l.user}] ${l.action}: ${l.text}
+        </div>
         `;
     });
-
-}, (error) => {
-    console.error("Logs Listener Error:", error);
 });
 
 </script>
+
+</body>
+</html>
