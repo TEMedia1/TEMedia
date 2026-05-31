@@ -206,6 +206,167 @@ img{
 </header>
 
 <div class="feed" id="feed"></div>
+<body>
 
+<div class="left">
+
+<h2>Staff Panel</h2>
+
+<input id="title" placeholder="Title">
+<textarea id="desc" placeholder="Description"></textarea>
+
+<input id="location" placeholder="Location (e.g. Hobart)">
+
+<select id="category">
+<option>Fire</option>
+<option>Rescue</option>
+<option>Traffic</option>
+<option>General</option>
+</select>
+
+<input id="image" type="file">
+
+<label>
+<input type="checkbox" id="emergency"> Emergency Mode
+</label>
+
+<button onclick="post()">Post</button>
+
+<hr>
+
+<h3>Posts</h3>
+<div id="posts"></div>
+
+</div>
+
+<div class="right">
+<h3>Logs</h3>
+<div id="logs"></div>
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+getFirestore,
+collection,
+addDoc,
+deleteDoc,
+doc,
+query,
+orderBy,
+onSnapshot
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+import {
+getStorage,
+ref,
+uploadBytes,
+getDownloadURL
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAIqLic00FcNgtuKZATMdHU4jRITnYO2A8",
+  authDomain: "temedia20-be031.firebaseapp.com",
+  projectId: "temedia20-be031",
+  storageBucket: "temedia20-be031.firebasestorage.app",
+  messagingSenderId: "514394139848",
+  appId: "1:514394139848:web:7edabb080c12b87bc909fd"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const storage = getStorage(app);
+
+const user = sessionStorage.getItem("staffUser");
+
+/* LOG */
+async function log(action,text){
+    await addDoc(collection(db,"logs"),{
+        user,
+        action,
+        text,
+        time: Date.now()
+    });
+}
+
+/* POST */
+window.post = async function(){
+
+    const title = document.getElementById("title").value;
+    const desc = document.getElementById("desc").value;
+    const location = document.getElementById("location").value;
+    const category = document.getElementById("category").value;
+    const emergency = document.getElementById("emergency").checked;
+
+    const file = document.getElementById("image").files[0];
+
+    let imageURL = "";
+
+    if(file){
+        const imgRef = ref(storage,"images/"+Date.now());
+        await uploadBytes(imgRef,file);
+        imageURL = await getDownloadURL(imgRef);
+    }
+
+    await addDoc(collection(db,"posts"),{
+        title,
+        desc,
+        location,
+        category,
+        emergency,
+        image:imageURL,
+        time:Date.now()
+    });
+
+    await log("POSTED",title);
+
+    alert("Posted!");
+}
+
+/* POSTS */
+const q1 = query(collection(db,"posts"),orderBy("time","desc"));
+
+onSnapshot(q1,(snap)=>{
+    posts.innerHTML="";
+
+    snap.forEach((d)=>{
+        const data=d.data();
+
+        posts.innerHTML+=`
+        <div class="card">
+            <b>${data.title}</b><br>
+            <button onclick="del('${d.id}','${data.title}')">Delete</button>
+        </div>
+        `;
+    });
+});
+
+/* DELETE */
+window.del = async function(id,title){
+    await deleteDoc(doc(db,"posts",id));
+    await log("DELETED",title);
+}
+
+/* LOGS */
+const q2 = query(collection(db,"logs"),orderBy("time","desc"));
+
+onSnapshot(q2,(snap)=>{
+    logs.innerHTML="";
+
+    snap.forEach((d)=>{
+        const l=d.data();
+
+        logs.innerHTML+=`
+        <div class="card">
+            [${l.user}] ${l.action}: ${l.text}
+        </div>
+        `;
+    });
+});
+
+</script>
+
+    
 </body>
 </html>
