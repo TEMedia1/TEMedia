@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -7,13 +8,12 @@
 
 <style>
 body{
-    font-family: Arial, sans-serif;
+    font-family:Arial,sans-serif;
     margin:0;
     background:#f4f6f9;
     color:#1a1a1a;
 }
 
-/* HEADER */
 header{
     position:sticky;
     top:0;
@@ -23,32 +23,28 @@ header{
     display:flex;
     align-items:center;
     justify-content:space-between;
-    z-index:10;
-    box-shadow:0 2px 10px rgba(0,0,0,0.15);
+    z-index:100;
+    box-shadow:0 2px 10px rgba(0,0,0,.15);
 }
 
-/* LOGO */
 .logo img{
     height:32px;
     border-radius:6px;
 }
 
-/* CENTER TITLE */
 .title{
     position:absolute;
     left:50%;
     transform:translateX(-50%);
     font-weight:700;
     font-size:16px;
-    white-space:nowrap;
 }
 
-/* NAV */
 .nav{
     display:flex;
     gap:10px;
-    font-size:13px;
     align-items:center;
+    font-size:13px;
 }
 
 .nav a{
@@ -56,82 +52,61 @@ header{
     text-decoration:none;
 }
 
-/* FEED (CENTERED LIKE NEWS SITE) */
 .feed{
-    max-width:600px;
+    max-width:700px;
     margin:20px auto;
     padding:10px;
 }
 
-/* CARD */
 .card{
     background:white;
-    padding:12px;
-    margin-bottom:10px;
     border-radius:12px;
     border:1px solid #e6e8ec;
-    box-shadow:0 1px 6px rgba(0,0,0,0.05);
+    padding:14px;
+    margin-bottom:15px;
+    box-shadow:0 2px 8px rgba(0,0,0,.05);
 }
 
-.card:active{
-    transform:scale(0.99);
+.card h2{
+    margin:0 0 8px;
+    font-size:18px;
 }
 
-/* EMERGENCY */
-.emergency{
-    border-left:4px solid #dc2626;
+.card p{
+    margin:0;
+    line-height:1.5;
 }
 
-/* TEXT */
-h2{
-    margin:0 0 5px 0;
-    font-size:16px;
-}
-
-p{
-    margin:5px 0;
-    font-size:14px;
-    line-height:1.35;
-}
-
-/* META */
 .meta{
-    font-size:11px;
+    margin-top:12px !important;
+    font-size:12px;
     color:#6b7280;
 }
 
-/* BADGE */
-.badge{
-    background:#dc2626;
-    color:white;
-    padding:3px 7px;
-    font-size:10px;
-    border-radius:5px;
-    display:inline-block;
-    margin-bottom:6px;
-    font-weight:600;
+.gallery{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:10px;
+    margin-top:12px;
 }
 
-/* IMAGE */
-img{ 
+.gallery img{
     width:100%;
     border-radius:10px;
-    margin-top:8px;
-    border:1px solid #e5e7eb;
+    border:1px solid #ddd;
+    display:block;
 }
 
-/* =========================
-   MOBILE FIX (ADDED)
-   ========================= */
-@media (max-width: 600px) {
+.loading{
+    text-align:center;
+    color:#777;
+    padding:40px;
+}
+
+@media(max-width:600px){
 
     header{
         flex-wrap:wrap;
-        padding:10px;
-    }
-
-    .logo img{
-        height:26px;
     }
 
     .title{
@@ -140,83 +115,74 @@ img{
         width:100%;
         text-align:center;
         margin-top:6px;
-        font-size:14px;
     }
 
     .nav{
         width:100%;
         justify-content:center;
-        flex-wrap:wrap;
-        font-size:12px;
-        gap:6px;
         margin-top:6px;
-    }
-
-    .nav span{
-        display:none;
+        flex-wrap:wrap;
     }
 
     .feed{
-        margin:10px auto;
         padding:8px;
-        max-width:100%;
-    }
-
-    .card{
-        padding:10px;
-    }
-
-    h2{
-        font-size:15px;
-    }
-
-    p{
-        font-size:13px;
-    }
-
-    .meta{
-        font-size:10px;
     }
 }
 </style>
+
 </head>
 
 <body>
 
 <header>
-    <div class="logo">
-        <img src="TEM2.png">
-    </div>
 
-    <div class="title">
-        TEM • HOME PAGE
-    </div>
+```
+<div class="logo">
+    <img src="TEM2.png">
+</div>
 
-    <div class="nav">
-        <a href="index.html">Main</a>
-        <span>•</span>
-        <a href="store.html">Store</a>
-        <span>•</span>
-        <a href="socials.html">Socials</a>
-        <span>•</span>
-        <a href="page4.html">N/A</a>
-        <span>•</span>
-        <a href="page5.html">N/A</a>
-    </div>
+<div class="title">
+    TEM • HOME PAGE
+</div>
+
+<div class="nav">
+    <a href="index.html">Main</a>
+    <span>•</span>
+    <a href="store.html">Store</a>
+    <span>•</span>
+    <a href="socials.html">Socials</a>
+    <span>•</span>
+    <a href="page4.html">N/A</a>
+    <span>•</span>
+    <a href="page5.html">N/A</a>
+</div>
+```
+
 </header>
 
-<div class="feed" id="feed"></div>
+<div class="feed" id="feed">
+
+```
+<div class="loading">
+    Loading posts...
+</div>
+```
+
+</div>
 
 <script type="module">
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
 import {
-getFirestore,
-collection,
-query,
-orderBy,
-onSnapshot
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    getFirestore,
+    collection,
+    query,
+    orderBy,
+    onSnapshot
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAIqLic00FcNgtuKZATMdHU4jRITnYO2A8",
@@ -232,32 +198,66 @@ const db = getFirestore(app);
 
 const feed = document.getElementById("feed");
 
-function timeFormat(t){
-    if(!t) return "";
-    return new Date(t).toLocaleString();
+function formatTime(timestamp){
+
+    if(!timestamp) return "";
+
+    return new Date(timestamp).toLocaleString();
 }
 
-const q = query(collection(db,"posts"), orderBy("time","desc"));
+const postsQuery = query(
+    collection(db,"posts"),
+    orderBy("time","desc")
+);
 
-onSnapshot(q,(snap)=>{
+onSnapshot(postsQuery,(snapshot)=>{
+
     feed.innerHTML = "";
 
-    snap.forEach((doc)=>{
-        const d = doc.data();
+    if(snapshot.empty){
+
+        feed.innerHTML = `
+            <div class="card">
+                No posts yet.
+            </div>
+        `;
+        return;
+    }
+
+    snapshot.forEach((doc)=>{
+
+        const post = doc.data();
+
+        let galleryHTML = "";
+
+        if(post.images && post.images.length){
+
+            galleryHTML += `<div class="gallery">`;
+
+            post.images.forEach((image)=>{
+
+                galleryHTML += `
+                    <img src="${image}" loading="lazy">
+                `;
+
+            });
+
+            galleryHTML += `</div>`;
+        }
 
         feed.innerHTML += `
-        <div class="card ${d.emergency ? "emergency":""}">
-            ${d.emergency ? "<div class='badge'>EMERGENCY</div>" : ""}
-            
-            <h2>${d.title || ""}</h2>
-            <p>${d.desc || ""}</p>
+        <div class="card">
 
-            ${d.location ? `<p class="meta"> ${d.location}</p>` : ""}
-            ${d.category ? `<p class="meta"> ${d.category}</p>` : ""}
+            <h2>${post.title || ""}</h2>
 
-            ${d.image ? `<img src="${d.image}">` : ""}
+            <p>${post.desc || ""}</p>
 
-            <p class="meta">${timeFormat(d.time)}</p>
+            ${galleryHTML}
+
+            <p class="meta">
+                ${formatTime(post.time)}
+            </p>
+
         </div>
         `;
     });
