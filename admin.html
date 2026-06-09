@@ -176,6 +176,7 @@ header{
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
 import {
     getFirestore,
     collection,
@@ -204,84 +205,124 @@ const firebaseConfig = {
     appId: "1:514394139848:web:7edabb080c12b87bc909fd"
 };
 
+/* INITIALIZE FIREBASE */
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const storage = getStorage(app);
 
-}
+/* USER */
+const user = localStorage.getItem("user") || "Unknown";
 
 /* ELEMENTS */
 const postsDiv = document.getElementById("posts");
 const logsDiv = document.getElementById("logs");
 
 /* LOG FUNCTION */
-async function log(action,text){
-    await addDoc(collection(db,"logs"),{
+async function log(action, text) {
+    await addDoc(collection(db, "logs"), {
         user,
         action,
         text,
-        time:Date.now()
+        time: Date.now()
     });
 }
 
 /* POST */
-window.post = async function(){
+window.post = async function () {
 
-    const title = document.getElementById("title").value;
-    const desc = document.getElementById("desc").value;
-    const location = document.getElementById("location").value;
-    const category = document.getElementById("category").value;
-    const emergency = document.getElementById("emergency").checked;
-    const file = document.getElementById("image").files[0];
+    try {
 
-    let imageURL = "";
+        const title = document.getElementById("title").value;
+        const desc = document.getElementById("desc").value;
+        const location = document.getElementById("location").value;
+        const category = document.getElementById("category").value;
+        const emergency = document.getElementById("emergency").checked;
+        const file = document.getElementById("image").files[0];
 
-    if(file){
-        const imgRef = ref(storage,"images/"+Date.now());
-        await uploadBytes(imgRef,file);
-        imageURL = await getDownloadURL(imgRef);
+        let imageURL = "";
+
+        if (file) {
+
+            const imgRef = ref(
+                storage,
+                `images/${Date.now()}-${file.name}`
+            );
+
+            await uploadBytes(imgRef, file);
+
+            imageURL = await getDownloadURL(imgRef);
+
+            console.log("Uploaded:", imageURL);
+        }
+
+        await addDoc(collection(db, "posts"), {
+            title,
+            desc,
+            location,
+            category,
+            emergency,
+            image: imageURL,
+            time: Date.now()
+        });
+
+        await log("POSTED", title);
+
+        document.getElementById("title").value = "";
+        document.getElementById("desc").value = "";
+        document.getElementById("location").value = "";
+        document.getElementById("image").value = "";
+        document.getElementById("emergency").checked = false;
+
+        alert("Posted!");
+
+    } catch (err) {
+
+        console.error(err);
+
+        alert(
+            "Upload failed:\n" +
+            err.message
+        );
     }
-
-    await addDoc(collection(db,"posts"),{
-        title,
-        desc,
-        location,
-        category,
-        emergency,
-        image:imageURL,
-        time:Date.now()
-    });
-
-    await log("POSTED",title);
-
-    /* RESET */
-    document.getElementById("title").value = "";
-    document.getElementById("desc").value = "";
-    document.getElementById("location").value = "";
-    document.getElementById("image").value = "";
-    document.getElementById("emergency").checked = false;
-
-    alert("Posted!");
 };
 
 /* DELETE */
-window.del = async function(id,title){
-    await deleteDoc(doc(db,"posts",id));
-    await log("DELETED",title);
+window.del = async function (id, title) {
+
+    try {
+
+        await deleteDoc(doc(db, "posts", id));
+
+        await log("DELETED", title);
+
+    } catch (err) {
+
+        console.error(err);
+
+        alert(err.message);
+    }
 };
 
 /* POSTS LIVE */
-const q1 = query(collection(db,"posts"),orderBy("time","desc"));
+const q1 = query(
+    collection(db, "posts"),
+    orderBy("time", "desc")
+);
 
-onSnapshot(q1,(snap)=>{
+onSnapshot(q1, (snap) => {
 
-    postsDiv.innerHTML="";
+    postsDiv.innerHTML = "";
 
-    snap.forEach((d)=>{
+    snap.forEach((d) => {
 
         const data = d.data();
 
         postsDiv.innerHTML += `
         <div class="card">
-            <b>${data.title}</b><br><br>
-            <button onclick="del('${d.id}','${data.title.replace(/'/g,"\\'")}')">
+            <b>${data.title}</b>
+            <br><br>
+
+            <button onclick="del('${d.id}','${data.title.replace(/'/g, "\\'")}')">
                 Delete
             </button>
         </div>
@@ -290,13 +331,16 @@ onSnapshot(q1,(snap)=>{
 });
 
 /* LOGS LIVE */
-const q2 = query(collection(db,"logs"),orderBy("time","desc"));
+const q2 = query(
+    collection(db, "logs"),
+    orderBy("time", "desc")
+);
 
-onSnapshot(q2,(snap)=>{
+onSnapshot(q2, (snap) => {
 
-    logsDiv.innerHTML="";
+    logsDiv.innerHTML = "";
 
-    snap.forEach((d)=>{
+    snap.forEach((d) => {
 
         const l = d.data();
 
@@ -310,5 +354,6 @@ onSnapshot(q2,(snap)=>{
 
 </script>
 
+    
 </body>
 </html>
