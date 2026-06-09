@@ -204,14 +204,7 @@ const firebaseConfig = {
     appId: "1:514394139848:web:7edabb080c12b87bc909fd"
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const storage = getStorage(app);
 
-/* LOGIN CHECK */
-const user = sessionStorage.getItem("staffUser");
-if(!user){
-    location.href = "login.html";
 }
 
 /* ELEMENTS */
