@@ -1,243 +1,67 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Staff Panel</title>
+<meta charset="UTF-8">
+<title>TEM Admin</title>
 
 <style>
 body{
-    font-family: system-ui, Arial, sans-serif;
-    margin:0;
-    background:#f3f4f6;
-    color:#111827;
-}
-
-/* TOP BAR */
-.topbar{
-    height:55px;
-    background:#0f172a;
-    color:white;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:0 16px;
-    position:sticky;
-    top:0;
-    z-index:20;
-}
-
-.topbar h1{
-    font-size:16px;
-    margin:0;
-}
-
-.topbar button{
-    background:#dc2626;
-    border:none;
-    color:white;
-    padding:8px 10px;
-    border-radius:8px;
-    cursor:pointer;
-}
-
-/* MAIN LAYOUT */
-.container{
-    display:flex;
-}
-
-/* LEFT */
-.left{
-    width:70%;
+    font-family:Arial;
+    max-width:800px;
+    margin:auto;
     padding:20px;
 }
 
-/* RIGHT PANEL (hidden drawer style) */
-.right{
-    width:320px;
-    background:white;
-    position:fixed;
-    right:-340px;
-    top:55px;
-    height:calc(100vh - 55px);
-    overflow:auto;
-    box-shadow:-10px 0 30px rgba(0,0,0,0.1);
-    transition:0.3s;
-    padding:15px;
-    z-index:15;
-}
-
-.right.open{
-    right:0;
-}
-
-/* INPUTS */
-input,textarea,select{
+input, textarea{
     width:100%;
     padding:10px;
     margin-bottom:10px;
-    border-radius:8px;
-    border:1px solid #d1d5db;
-    background:white;
 }
 
-/* BUTTON */
-button.main{
-    width:100%;
-    padding:10px;
-    border:none;
-    border-radius:8px;
-    background:#dc2626;
-    color:white;
-    font-weight:bold;
+button{
+    padding:12px 20px;
     cursor:pointer;
 }
 
-/* CARD */
-.card{
-    background:white;
-    padding:12px;
-    border-radius:10px;
-    border:1px solid #e5e7eb;
-    margin-bottom:10px;
-}
-
-/* LOG BUTTON */
-.logToggle{
-    position:fixed;
-    right:15px;
-    bottom:15px;
-    background:#0f172a;
-    color:white;
-    border:none;
-    padding:10px 12px;
-    border-radius:50px;
-    cursor:pointer;
-    z-index:30;
-}
-
-/* LOCK SCREEN */
-.lock{
-    position:fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    background:#0f172a;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    z-index:100;
-}
-
-.lockBox{
-    background:white;
-    padding:20px;
-    border-radius:12px;
-    width:300px;
-}
-
-.lockBox input{
-    width:100%;
-    padding:10px;
+#status{
     margin-top:10px;
-}
-
-/* MOBILE */
-@media (max-width:700px){
-    .left{
-        width:100%;
-        padding:15px;
-    }
-
-    .right{
-        width:100%;
-    }
+    font-weight:bold;
 }
 </style>
 </head>
-
 <body>
 
-<!-- LOCK SCREEN -->
-<div class="lock" id="lock">
-    <div class="lockBox">
-        <h3>Staff Login</h3>
-        <p>Enter access code</p>
-        <input id="pass" placeholder="Password">
-        <button class="main" onclick="unlock()">Enter</button>
-    </div>
-</div>
+<h1>Create Post</h1>
 
-<!-- TOP BAR -->
-<div class="topbar">
-    <h1>Staff Control Panel</h1>
-    <button onclick="toggleLogs()">Logs</button>
-</div>
+<input type="text" id="title" placeholder="Post Title">
 
-<div class="container">
+<textarea id="description" rows="6" placeholder="Description"></textarea>
 
-<!-- LEFT -->
-<div class="left">
+<input type="file" id="images" multiple accept="image/*">
 
-<h2>Post System</h2>
+<button onclick="createPost()">POST</button>
 
-<input id="title" placeholder="Title">
-<textarea id="desc" placeholder="Description"></textarea>
-
-<input id="location" placeholder="Location">
-
-<select id="category">
-<option>Fire</option>
-<option>Rescue</option>
-<option>Traffic</option>
-<option>General</option>
-</select>
-
-<input id="image" type="file">
-
-<label>
-<input type="checkbox" id="emergency"> Emergency Mode
-</label>
-
-<button class="main" onclick="post()">Post</button>
-
-<hr>
-
-<h3>Posts</h3>
-<div id="posts"></div>
-
-</div>
-
-<!-- LOGS DRAWER -->
-<div class="right" id="logsPanel">
-<h3>Logs</h3>
-<div id="logs"></div>
-</div>
-
-</div>
-
-<!-- FLOAT LOG BUTTON -->
-<button class="logToggle" onclick="toggleLogs()">Logs</button>
+<div id="status"></div>
 
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
 import {
 getFirestore,
 collection,
 addDoc,
-deleteDoc,
-doc,
-query,
-orderBy,
-onSnapshot
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+serverTimestamp
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 import {
 getStorage,
 ref,
 uploadBytes,
 getDownloadURL
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAIqLic00FcNgtuKZATMdHU4jRITnYO2A8",
@@ -252,107 +76,65 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const storage = getStorage(app);
 
-const user = sessionStorage.getItem("staffUser");
+window.createPost = async function(){
 
-/* LOCK */
-window.unlock = function(){
-    const pass = document.getElementById("pass").value;
-    if(pass === "T4M26"){
-        document.getElementById("lock").style.display="none";
-    } else {
-        alert("Wrong code");
-    }
+const title = document.getElementById("title").value;
+const description = document.getElementById("description").value;
+const files = document.getElementById("images").files;
+const status = document.getElementById("status");
+
+if(!title){
+    alert("Enter a title");
+    return;
 }
 
-/* LOGS TOGGLE */
-window.toggleLogs = function(){
-    document.getElementById("logsPanel").classList.toggle("open");
+if(files.length < 2 || files.length > 4){
+    alert("Upload between 2 and 4 images");
+    return;
 }
 
-/* LOG */
-async function log(action,text){
-    await addDoc(collection(db,"logs"),{
-        user,
-        action,
-        text,
-        time: Date.now()
-    });
+status.innerHTML = "Uploading...";
+
+try{
+
+let imageUrls = [];
+
+for(let i=0;i<files.length;i++){
+
+const file = files[i];
+
+const storageRef = ref(
+storage,
+`posts/${Date.now()}_${file.name}`
+);
+
+await uploadBytes(storageRef,file);
+
+const url = await getDownloadURL(storageRef);
+
+imageUrls.push(url);
+
 }
 
-/* POST */
-window.post = async function(){
-
-    const title = document.getElementById("title").value;
-    const desc = document.getElementById("desc").value;
-    const location = document.getElementById("location").value;
-    const category = document.getElementById("category").value;
-    const emergency = document.getElementById("emergency").checked;
-
-    const file = document.getElementById("image").files[0];
-
-    let imageURL = "";
-
-    if(file){
-        const imgRef = ref(storage,"images/"+Date.now());
-        await uploadBytes(imgRef,file);
-        imageURL = await getDownloadURL(imgRef);
-    }
-
-    await addDoc(collection(db,"posts"),{
-        title,
-        desc,
-        location,
-        category,
-        emergency,
-        image:imageURL,
-        time:Date.now()
-    });
-
-    await log("POSTED",title);
-
-    alert("Posted!");
-}
-
-/* POSTS */
-const q1 = query(collection(db,"posts"),orderBy("time","desc"));
-
-onSnapshot(q1,(snap)=>{
-    posts.innerHTML="";
-
-    snap.forEach((d)=>{
-        const data=d.data();
-
-        posts.innerHTML+=`
-        <div class="card">
-            <b>${data.title}</b><br>
-            <button onclick="del('${d.id}','${data.title}')">Delete</button>
-        </div>
-        `;
-    });
+await addDoc(collection(db,"posts"),{
+title,
+description,
+images:imageUrls,
+createdAt:serverTimestamp()
 });
 
-/* DELETE */
-window.del = async function(id,title){
-    await deleteDoc(doc(db,"posts",id));
-    await log("DELETED",title);
+status.innerHTML = "Post Created!";
+
+document.getElementById("title").value="";
+document.getElementById("description").value="";
+document.getElementById("images").value="";
+
+}catch(err){
+console.error(err);
+status.innerHTML = "Error creating post";
 }
 
-/* LOGS */
-const q2 = query(collection(db,"logs"),orderBy("time","desc"));
-
-onSnapshot(q2,(snap)=>{
-    logs.innerHTML="";
-
-    snap.forEach((d)=>{
-        const l=d.data();
-
-        logs.innerHTML+=`
-        <div class="card">
-            [${l.user}] ${l.action}: ${l.text}
-        </div>
-        `;
-    });
-});
+}
 
 </script>
 
