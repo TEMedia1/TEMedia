@@ -2,6 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TEM Admin</title>
 
 <style>
@@ -19,13 +20,11 @@ input, textarea{
 }
 
 button{
-    padding:12px 20px;
-    cursor:pointer;
+    padding:10px 20px;
 }
 
 #status{
     margin-top:10px;
-    font-weight:bold;
 }
 </style>
 </head>
@@ -33,13 +32,15 @@ button{
 
 <h1>Create Post</h1>
 
-<input type="text" id="title" placeholder="Post Title">
+<input type="text" id="title" placeholder="Title">
 
-<textarea id="description" rows="6" placeholder="Description"></textarea>
+<textarea id="description" rows="5" placeholder="Description"></textarea>
 
-<input type="file" id="images" multiple accept="image/*">
+<input type="file" id="image" accept="image/*">
 
-<button onclick="createPost()">POST</button>
+<br><br>
+
+<button id="postBtn">POST</button>
 
 <div id="status"></div>
 
@@ -52,16 +53,14 @@ getFirestore,
 collection,
 addDoc,
 serverTimestamp
-}
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 import {
 getStorage,
 ref,
 uploadBytes,
 getDownloadURL
-}
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAIqLic00FcNgtuKZATMdHU4jRITnYO2A8",
@@ -76,65 +75,42 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const storage = getStorage(app);
 
-window.createPost = async function(){
+document.getElementById("postBtn").addEventListener("click", async () => {
 
 const title = document.getElementById("title").value;
 const description = document.getElementById("description").value;
-const files = document.getElementById("images").files;
-const status = document.getElementById("status");
+const file = document.getElementById("image").files[0];
 
-if(!title){
-    alert("Enter a title");
+if(!title || !file){
+    alert("Title and image required");
     return;
 }
-
-if(files.length < 2 || files.length > 4){
-    alert("Upload between 2 and 4 images");
-    return;
-}
-
-status.innerHTML = "Uploading...";
 
 try{
 
-let imageUrls = [];
+document.getElementById("status").innerHTML = "Uploading...";
 
-for(let i=0;i<files.length;i++){
+const imageRef = ref(storage, "posts/" + Date.now());
 
-const file = files[i];
+await uploadBytes(imageRef, file);
 
-const storageRef = ref(
-storage,
-`posts/${Date.now()}_${file.name}`
-);
+const imageURL = await getDownloadURL(imageRef);
 
-await uploadBytes(storageRef,file);
-
-const url = await getDownloadURL(storageRef);
-
-imageUrls.push(url);
-
-}
-
-await addDoc(collection(db,"posts"),{
-title,
-description,
-images:imageUrls,
-createdAt:serverTimestamp()
+await addDoc(collection(db, "posts"), {
+    title,
+    description,
+    image:imageURL,
+    createdAt:serverTimestamp()
 });
 
-status.innerHTML = "Post Created!";
-
-document.getElementById("title").value="";
-document.getElementById("description").value="";
-document.getElementById("images").value="";
+document.getElementById("status").innerHTML = "Post Created!";
 
 }catch(err){
-console.error(err);
-status.innerHTML = "Error creating post";
+    console.error(err);
+    document.getElementById("status").innerHTML = err.message;
 }
 
-}
+});
 
 </script>
 
