@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TEM • New Post</title>
+
+<style>
+
+body{
+    font-family:Arial,sans-serif;
+    background:#f1f1f1;
+    margin:0;
+}
+
+header{
+    background:#0a3558;
+    padding:15px 20px;
+    display:flex;
+    align-items:center;
+    box-shadow:0 4px 6px rgba(0,0,0,.2);
+}
+
+.logo img{
+    height:40px;
+    cursor:pointer;
+}
+
+.container{
+    max-width:700px;
+    margin:30px auto;
+    background:#fff;
+    padding:25px;
+    border-radius:10px;
+    box-shadow:0 2px 10px rgba(0,0,0,.15);
+}
+
+h1{
+    margin-top:0;
+}
+
+input,
+textarea{
+    width:100%;
+    box-sizing:border-box;
+    padding:12px;
+    margin-top:8px;
+    margin-bottom:20px;
+    border:1px solid #ccc;
+    border-radius:6px;
+    font-size:16px;
+}
+
+textarea{
+    height:220px;
+    resize:vertical;
+}
+
+button{
+    background:#0a3558;
+    color:white;
+    border:none;
+    padding:14px 22px;
+    font-size:16px;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#0d4878;
+}
+
+#status{
+    margin-top:20px;
+    font-weight:bold;
+}
+
+</style>
+</head>
+<body>
+
+<header>
+    <div class="logo" onclick="window.location.href='/'">
+        <img src="TEM1.jpg">
+    </div>
+</header>
+
+<div class="container">
+
+<h1>Create Post</h1>
+
+<label>Title</label>
+<input id="title" type="text" placeholder="Post title">
+
+<label>Image URL (optional)</label>
+<input id="image" type="text" placeholder="https://example.com/image.jpg">
+
+<label>Content</label>
+<textarea id="content" placeholder="Write your post here..."></textarea>
+
+<button id="publish">Publish Post</button>
+
+<div id="status"></div>
+
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+
+import {
+    getFirestore,
+    collection,
+    addDoc,
+    serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyAIqLic00FcNgtuKZATMdHU4jRITnYO2A8",
+    authDomain: "temedia20-be031.firebaseapp.com",
+    projectId: "temedia20-be031",
+    storageBucket: "temedia20-be031.firebasestorage.app",
+    messagingSenderId: "514394139848",
+    appId: "1:514394139848:web:7edabb080c12b87bc909fd"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const title = document.getElementById("title");
+const image = document.getElementById("image");
+const content = document.getElementById("content");
+const status = document.getElementById("status");
+
+document.getElementById("publish").onclick = async ()=>{
+
+    if(title.value.trim()=="" || content.value.trim()==""){
+        status.style.color="red";
+        status.innerHTML="Please enter a title and content.";
+        return;
+    }
+
+    try{
+
+        await addDoc(collection(db,"posts"),{
+
+            title:title.value,
+            image:image.value,
+            content:content.value,
+            created:serverTimestamp()
+
+        });
+
+        status.style.color="green";
+        status.innerHTML="Post published!";
+
+        setTimeout(()=>{
+            window.location.href="/";
+        },1000);
+
+    }catch(err){
+
+        console.error(err);
+
+        status.style.color="red";
+        status.innerHTML="Error publishing post.";
+
+    }
+
+};
+
+</script>
+
+</body>
+</html>
