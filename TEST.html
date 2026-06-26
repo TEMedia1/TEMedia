@@ -3,21 +3,27 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TEM • New Post</title>
+<title>TEM • Admin</title>
 
 <style>
 
+*{
+    box-sizing:border-box;
+}
+
 body{
-    font-family:Arial,sans-serif;
-    background:#f1f1f1;
     margin:0;
+    background:#f1f1f1;
+    font-family:Arial,sans-serif;
 }
 
 header{
     background:#0a3558;
+    color:white;
     padding:15px 20px;
     display:flex;
     align-items:center;
+    justify-content:space-between;
     box-shadow:0 4px 6px rgba(0,0,0,.2);
 }
 
@@ -27,28 +33,36 @@ header{
 }
 
 .container{
-    max-width:700px;
+    max-width:950px;
     margin:30px auto;
-    background:#fff;
-    padding:25px;
+    padding:20px;
+}
+
+.card{
+    background:white;
     border-radius:10px;
+    padding:25px;
+    margin-bottom:30px;
     box-shadow:0 2px 10px rgba(0,0,0,.15);
 }
 
-h1{
+h1,h2{
     margin-top:0;
 }
 
-input,
-textarea{
+label{
+    display:block;
+    font-weight:bold;
+    margin-top:15px;
+    margin-bottom:5px;
+}
+
+input,textarea{
     width:100%;
-    box-sizing:border-box;
     padding:12px;
-    margin-top:8px;
-    margin-bottom:20px;
     border:1px solid #ccc;
     border-radius:6px;
-    font-size:16px;
+    font-size:15px;
 }
 
 textarea{
@@ -56,120 +70,137 @@ textarea{
     resize:vertical;
 }
 
-button{
-    background:#0a3558;
-    color:white;
-    border:none;
-    padding:14px 22px;
-    font-size:16px;
-    border-radius:6px;
-    cursor:pointer;
+.buttons{
+    display:flex;
+    gap:10px;
+    margin-top:20px;
 }
 
-button:hover{
-    background:#0d4878;
+button{
+    border:none;
+    padding:12px 20px;
+    border-radius:6px;
+    cursor:pointer;
+    font-size:15px;
+}
+
+#publish{
+    background:#0a3558;
+    color:white;
+}
+
+#update{
+    background:#2e7d32;
+    color:white;
+    display:none;
+}
+
+#cancel{
+    background:#777;
+    color:white;
+    display:none;
+}
+
+.post{
+    background:white;
+    border-radius:10px;
+    padding:20px;
+    margin-bottom:20px;
+    box-shadow:0 2px 8px rgba(0,0,0,.15);
+}
+
+.post img{
+    width:100%;
+    max-height:300px;
+    object-fit:cover;
+    border-radius:6px;
+    margin-top:10px;
+}
+
+.post h3{
+    margin:10px 0;
+}
+
+.post p{
+    white-space:pre-wrap;
+}
+
+.actions{
+    margin-top:15px;
+}
+
+.actions button{
+    margin-right:10px;
+}
+
+.editBtn{
+    background:#f0ad4e;
+    color:white;
+}
+
+.deleteBtn{
+    background:#d9534f;
+    color:white;
+}
+
+.date{
+    color:#777;
+    font-size:13px;
 }
 
 #status{
-    margin-top:20px;
+    margin-top:15px;
     font-weight:bold;
 }
 
 </style>
 </head>
+
 <body>
 
 <header>
-    <div class="logo" onclick="window.location.href='/'">
-        <img src="TEM1.jpg">
-    </div>
+
+<div class="logo" onclick="location.href='/'">
+<img src="TEM1.jpg">
+</div>
+
+<h2>TEM Admin</h2>
+
 </header>
 
 <div class="container">
 
-<h1>Create Post</h1>
+<div class="card">
+
+<h1>Create / Edit Post</h1>
 
 <label>Title</label>
-<input id="title" type="text" placeholder="Post title">
+<input id="title">
 
-<label>Image URL (optional)</label>
-<input id="image" type="text" placeholder="https://example.com/image.jpg">
+<label>Image URL</label>
+<input id="image">
 
 <label>Content</label>
-<textarea id="content" placeholder="Write your post here..."></textarea>
+<textarea id="content"></textarea>
 
-<button id="publish">Publish Post</button>
+<div class="buttons">
+
+<button id="publish">Publish</button>
+
+<button id="update">Update</button>
+
+<button id="cancel">Cancel</button>
+
+</div>
 
 <div id="status"></div>
 
 </div>
 
+<div id="posts">
+
+</div>
+
+</div>
+
 <script type="module">
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
-
-import {
-    getFirestore,
-    collection,
-    addDoc,
-    serverTimestamp
-} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
-
-const firebaseConfig = {
-    apiKey: "AIzaSyAIqLic00FcNgtuKZATMdHU4jRITnYO2A8",
-    authDomain: "temedia20-be031.firebaseapp.com",
-    projectId: "temedia20-be031",
-    storageBucket: "temedia20-be031.firebasestorage.app",
-    messagingSenderId: "514394139848",
-    appId: "1:514394139848:web:7edabb080c12b87bc909fd"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-const title = document.getElementById("title");
-const image = document.getElementById("image");
-const content = document.getElementById("content");
-const status = document.getElementById("status");
-
-document.getElementById("publish").onclick = async ()=>{
-
-    if(title.value.trim()=="" || content.value.trim()==""){
-        status.style.color="red";
-        status.innerHTML="Please enter a title and content.";
-        return;
-    }
-
-    try{
-
-        await addDoc(collection(db,"posts"),{
-
-            title:title.value,
-            image:image.value,
-            content:content.value,
-            created:serverTimestamp()
-
-        });
-
-        status.style.color="green";
-        status.innerHTML="Post published!";
-
-        setTimeout(()=>{
-            window.location.href="/";
-        },1000);
-
-    }catch(err){
-
-        console.error(err);
-
-        status.style.color="red";
-        status.innerHTML="Error publishing post.";
-
-    }
-
-};
-
-</script>
-
-</body>
-</html>
