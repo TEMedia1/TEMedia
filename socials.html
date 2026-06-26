@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TEM • Socials </title>
+<title>TEM • Socials</title>
 
 <style>
 
 body{
-    font-family:Arial;
-    background:#1f1f1f1;
+    font-family:Arial, sans-serif;
+    background:#f1f1f1;
     margin:0;
     padding:0;
 }
@@ -17,7 +17,7 @@ body{
 header{
     background:#0a3558;
     padding:15px 20px;
-    box-shadow:0 4px 6px rgba(0,0,0,0.1);
+    box-shadow:0 4px 6px rgba(0,0,0,0.15);
     display:flex;
     align-items:center;
 }
@@ -30,38 +30,71 @@ header{
     height:40px;
     width:auto;
     border-radius:5px;
-    transition:opacity 0.3s ease;
+    transition:opacity .3s;
 }
 
 .logo img:hover{
-    opacity:0.8;
+    opacity:.8;
 }
 
 .posts-container{
     max-width:900px;
-    margin:20px auto;
+    margin:30px auto;
     padding:20px;
 }
 
-.post{
-    background:white;
+h1{
+    text-align:center;
+    color:#0a3558;
+    margin-bottom:30px;
+}
+
+.social-card{
+    background:#fff;
+    border-radius:12px;
+    padding:20px;
     margin-bottom:20px;
-    border-radius:10px;
-    overflow:hidden;
-    box-shadow:0 1px 3px rgba(0,0,0,0.1);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    box-shadow:0 2px 8px rgba(0,0,0,.1);
+    transition:.25s;
 }
 
-.post img{
-    width:100%;
-    display:block;
+.social-card:hover{
+    transform:translateY(-3px);
+    box-shadow:0 6px 14px rgba(0,0,0,.15);
 }
 
-.content{
-    padding:20px;
+.social-info{
+    display:flex;
+    flex-direction:column;
 }
 
-.content h2{
-    margin-top:0;
+.social-title{
+    font-size:24px;
+    font-weight:bold;
+    margin-bottom:5px;
+}
+
+.social-link{
+    color:#666;
+    font-size:14px;
+    word-break:break-all;
+}
+
+.follow-btn{
+    background:#0a3558;
+    color:white;
+    padding:12px 22px;
+    text-decoration:none;
+    border-radius:8px;
+    font-weight:bold;
+    transition:.2s;
+}
+
+.follow-btn:hover{
+    background:#124d80;
 }
 
 </style>
@@ -69,12 +102,44 @@ header{
 <body>
 
 <header>
-    <div class="logo" onclick="window.location.href='/';">
+    <div class="logo" onclick="window.location.href='/'">
         <img src="TEM1.jpg" alt="TEM Logo">
     </div>
 </header>
 
-<div class="posts-container" id="posts"></div>
-    TEST
+<div class="posts-container">
+
+    <h1>Follow TEM Media</h1>
+
+    <!-- YouTube -->
+    <div class="social-card">
+        <div class="social-info">
+            <div class="social-title">📺 YouTube</div>
+            <div class="social-link">@TEMedia_1</div>
+        </div>
+
+        <a class="follow-btn"
+           href="https://www.youtube.com/@TEMedia_1"
+           target="_blank">
+            Subscribe
+        </a>
+    </div>
+
+    <!-- Facebook -->
+    <div class="social-card">
+        <div class="social-info">
+            <div class="social-title">📘 Facebook</div>
+            <div class="social-link">TEM Media</div>
+        </div>
+
+        <a class="follow-btn"
+           href="https://www.facebook.com/profile.php?id=61585965212767"
+           target="_blank">
+            Follow
+        </a>
+    </div>
+
+</div>
+
 </body>
 </html>
