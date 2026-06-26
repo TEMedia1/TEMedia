@@ -204,3 +204,108 @@ button{
 </div>
 
 <script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+
+import {
+    getFirestore,
+    collection,
+    addDoc,
+    getDocs,
+    query,
+    orderBy,
+    serverTimestamp,
+    deleteDoc,
+    updateDoc,
+    doc
+} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyAIqLic00FcNgtuKZATMdHU4jRITnYO2A8",
+    authDomain: "temedia20-be031.firebaseapp.com",
+    projectId: "temedia20-be031",
+    storageBucket: "temedia20-be031.firebasestorage.app",
+    messagingSenderId: "514394139848",
+    appId: "1:514394139848:web:7edabb080c12b87bc909fd"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const title = document.getElementById("title");
+const image = document.getElementById("image");
+const content = document.getElementById("content");
+
+const publishBtn = document.getElementById("publish");
+const updateBtn = document.getElementById("update");
+const cancelBtn = document.getElementById("cancel");
+
+const status = document.getElementById("status");
+const postsDiv = document.getElementById("posts");
+
+let editingID = null;
+
+publishBtn.onclick = async ()=>{
+
+    if(title.value.trim()=="" || content.value.trim()==""){
+        alert("Please enter a title and content.");
+        return;
+    }
+
+    await addDoc(collection(db,"posts"),{
+
+        title:title.value,
+        image:image.value,
+        content:content.value,
+        created:serverTimestamp()
+
+    });
+
+    clearForm();
+    loadPosts();
+
+};
+
+updateBtn.onclick = async ()=>{
+
+    if(!editingID) return;
+
+    await updateDoc(doc(db,"posts",editingID),{
+
+        title:title.value,
+        image:image.value,
+        content:content.value
+
+    });
+
+    clearForm();
+
+    editingID = null;
+
+    publishBtn.style.display="inline-block";
+    updateBtn.style.display="none";
+    cancelBtn.style.display="none";
+
+    loadPosts();
+
+};
+
+cancelBtn.onclick=()=>{
+
+    clearForm();
+
+    editingID=null;
+
+    publishBtn.style.display="inline-block";
+    updateBtn.style.display="none";
+    cancelBtn.style.display="none";
+
+};
+
+function clearForm(){
+
+    title.value="";
+    image.value="";
+    content.value="";
+    status.innerHTML="";
+
+}
