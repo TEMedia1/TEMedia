@@ -309,3 +309,96 @@ function clearForm(){
     status.innerHTML="";
 
 }
+async function loadPosts(){
+
+    postsDiv.innerHTML="";
+
+    const q=query(
+        collection(db,"posts"),
+        orderBy("created","desc")
+    );
+
+    const snapshot=await getDocs(q);
+
+    if(snapshot.empty){
+
+        postsDiv.innerHTML="<div class='card'><h2>No posts found.</h2></div>";
+        return;
+
+    }
+
+    snapshot.forEach(postDoc=>{
+
+        const post=postDoc.data();
+        const id=postDoc.id;
+
+        const card=document.createElement("div");
+        card.className="post";
+
+        const date=post.created
+            ? new Date(post.created.seconds*1000).toLocaleString()
+            : "";
+
+        card.innerHTML=`
+
+            ${post.image ? `<img src="${post.image}" alt="">` : ""}
+
+            <h3>${post.title}</h3>
+
+            <p>${post.content}</p>
+
+            <div class="date">${date}</div>
+
+            <div class="actions">
+
+                <button class="editBtn">Edit</button>
+
+                <button class="deleteBtn">Delete</button>
+
+            </div>
+
+        `;
+
+        // EDIT
+        card.querySelector(".editBtn").onclick=()=>{
+
+            editingID=id;
+
+            title.value=post.title || "";
+            image.value=post.image || "";
+            content.value=post.content || "";
+
+            publishBtn.style.display="none";
+            updateBtn.style.display="inline-block";
+            cancelBtn.style.display="inline-block";
+
+            window.scrollTo({
+                top:0,
+                behavior:"smooth"
+            });
+
+        };
+
+        // DELETE
+        card.querySelector(".deleteBtn").onclick=async()=>{
+
+            if(!confirm("Delete this post?")) return;
+
+            await deleteDoc(doc(db,"posts",id));
+
+            loadPosts();
+
+        };
+
+        postsDiv.appendChild(card);
+
+    });
+
+}
+
+loadPosts();
+
+</script>
+
+</body>
+</html>
