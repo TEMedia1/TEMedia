@@ -66,50 +66,6 @@ header{
 </header>
 
 <div class="posts-container" id="posts"></div>
-
-<script type="module">
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-
-import {
-getFirestore,
-collection,
-getDocs
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyAIqLic00FcNgtuKZATMdHU4jRITnYO2A8",
-  authDomain: "temedia20-be031.firebaseapp.com",
-  projectId: "temedia20-be031",
-  storageBucket: "temedia20-be031.firebasestorage.app",
-  messagingSenderId: "514394139848",
-  appId: "1:514394139848:web:7edabb080c12b87bc909fd"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-const postsDiv = document.getElementById("posts");
-
-const snapshot = await getDocs(collection(db,"posts"));
-
-snapshot.forEach(doc => {
-
-const post = doc.data();
-
-postsDiv.innerHTML += `
-<div class="post">
-    <img src="${post.image}">
-    <div class="content">
-        <h2>${post.title}</h2>
-        <p>${post.description}</p>
-    </div>
-</div>
-`;
-
-});
-
-</script>
-
+    
 </body>
 </html>
