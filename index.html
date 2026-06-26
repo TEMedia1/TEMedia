@@ -22,10 +22,19 @@ header{
     align-items:center;
 }
 
+.logo{
+    cursor:pointer;
+}
+
 .logo img{
     height:40px;
     width:auto;
     border-radius:5px;
+    transition:opacity 0.3s ease;
+}
+
+.logo img:hover{
+    opacity:0.8;
 }
 
 .posts-container{
@@ -60,7 +69,7 @@ header{
 <body>
 
 <header>
-    <div class="logo">
+    <div class="logo" onclick="window.location.href='/';">
         <img src="TEM1.jpg" alt="TEM Logo">
     </div>
 </header>
