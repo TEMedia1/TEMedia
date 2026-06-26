@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,8 +8,8 @@
 <style>
 
 body{
-    font-family:Arial;
-    background:#1f1f1f1;
+    font-family:Arial, sans-serif;
+    background:#f1f1f1;
     margin:0;
     padding:0;
 }
@@ -17,7 +17,7 @@ body{
 header{
     background:#0a3558;
     padding:15px 20px;
-    box-shadow:0 4px 6px rgba(0,0,0,0.1);
+    box-shadow:0 4px 6px rgba(0,0,0,.2);
     display:flex;
     align-items:center;
 }
@@ -28,27 +28,21 @@ header{
 
 .logo img{
     height:40px;
-    width:auto;
     border-radius:5px;
-    transition:opacity 0.3s ease;
-}
-
-.logo img:hover{
-    opacity:0.8;
 }
 
 .posts-container{
     max-width:900px;
-    margin:20px auto;
-    padding:20px;
+    margin:25px auto;
+    padding:0 15px;
 }
 
 .post{
-    background:white;
-    margin-bottom:20px;
+    background:#fff;
     border-radius:10px;
     overflow:hidden;
-    box-shadow:0 1px 3px rgba(0,0,0,0.1);
+    margin-bottom:25px;
+    box-shadow:0 2px 8px rgba(0,0,0,.15);
 }
 
 .post img{
@@ -61,7 +55,24 @@ header{
 }
 
 .content h2{
-    margin-top:0;
+    margin:0 0 10px;
+}
+
+.content p{
+    line-height:1.5;
+    white-space:pre-wrap;
+}
+
+.date{
+    color:#777;
+    font-size:13px;
+    margin-top:15px;
+}
+
+.loading{
+    text-align:center;
+    color:#666;
+    margin-top:50px;
 }
 
 </style>
@@ -69,12 +80,92 @@ header{
 <body>
 
 <header>
-    <div class="logo" onclick="window.location.href='/';">
+    <div class="logo" onclick="window.location.href='/'">
         <img src="TEM1.jpg" alt="TEM Logo">
     </div>
 </header>
 
-<div class="posts-container" id="posts"></div>
-    TEST
+<div class="posts-container" id="posts">
+    <div class="loading">Loading posts...</div>
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+
+import {
+    getFirestore,
+    collection,
+    getDocs,
+    query,
+    orderBy
+} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyAIqLic00FcNgtuKZATMdHU4jRITnYO2A8",
+    authDomain: "temedia20-be031.firebaseapp.com",
+    projectId: "temedia20-be031",
+    storageBucket: "temedia20-be031.firebasestorage.app",
+    messagingSenderId: "514394139848",
+    appId: "1:514394139848:web:7edabb080c12b87bc909fd"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const postsDiv = document.getElementById("posts");
+
+async function loadPosts(){
+
+    postsDiv.innerHTML = "";
+
+    const q = query(
+        collection(db,"posts"),
+        orderBy("created","desc")
+    );
+
+    const snapshot = await getDocs(q);
+
+    if(snapshot.empty){
+        postsDiv.innerHTML = "<div class='loading'>No posts yet.</div>";
+        return;
+    }
+
+    snapshot.forEach(doc=>{
+
+        const post = doc.data();
+
+        const image = post.image
+            ? `<img src="${post.image}" alt="">`
+            : "";
+
+        const date = post.created
+            ? new Date(post.created.seconds*1000).toLocaleString()
+            : "";
+
+        postsDiv.innerHTML += `
+            <div class="post">
+
+                ${image}
+
+                <div class="content">
+                    <h2>${post.title}</h2>
+
+                    <p>${post.content}</p>
+
+                    <div class="date">${date}</div>
+                </div>
+
+            </div>
+        `;
+
+    });
+
+}
+
+loadPosts();
+
+</script>
+
 </body>
 </html>
