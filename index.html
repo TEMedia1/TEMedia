@@ -1,2 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TEM • Home Page</title>
-TEM - Tasmanian Emergency Media
+
+<style>
+
+body{
+    font-family:Arial;
+    background:#f4f4f4;
+    margin:0;
+    padding:0;
+}
+
+header{
+    background:#fff;
+    padding:15px 20px;
+    box-shadow:0 2px 4px rgba(0,0,0,0.1);
+    display:flex;
+    align-items:center;
+}
+
+.logo img{
+    height:40px;
+    width:auto;
+    border-radius:4px;
+}
+
+.posts-container{
+    max-width:900px;
+    margin:20px auto;
+    padding:20px;
+}
+
+.post{
+    background:white;
+    margin-bottom:20px;
+    border-radius:10px;
+    overflow:hidden;
+    box-shadow:0 1px 3px rgba(0,0,0,0.1);
+}
+
+.post img{
+    width:100%;
+    display:block;
+}
+
+.content{
+    padding:20px;
+}
+
+.content h2{
+    margin-top:0;
+}
+
+</style>
+</head>
+<body>
+
+<header>
+    <div class="logo">
+        <img src="TEM1.jpg" alt="TEM Logo">
+    </div>
+</header>
+
+<div class="posts-container" id="posts"></div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+getFirestore,
+collection,
+getDocs
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAIqLic00FcNgtuKZATMdHU4jRITnYO2A8",
+  authDomain: "temedia20-be031.firebaseapp.com",
+  projectId: "temedia20-be031",
+  storageBucket: "temedia20-be031.firebasestorage.app",
+  messagingSenderId: "514394139848",
+  appId: "1:514394139848:web:7edabb080c12b87bc909fd"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const postsDiv = document.getElementById("posts");
+
+const snapshot = await getDocs(collection(db,"posts"));
+
+snapshot.forEach(doc => {
+
+const post = doc.data();
+
+postsDiv.innerHTML += `
+<div class="post">
+    <img src="${post.image}">
+    <div class="content">
+        <h2>${post.title}</h2>
+        <p>${post.description}</p>
+    </div>
+</div>
+`;
+
+});
+
+</script>
+
+</body>
+</html>
