@@ -1,171 +1,68 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TEM • Home Page</title>
 
-<style>
+<div class="folder-menu">
 
-body{
-    font-family:Arial, sans-serif;
-    background:#f1f1f1;
-    margin:0;
-    padding:0;
-}
+  <details>
+    <summary>📁 Tasmania</summary>
 
-header{
-    background:#0a3558;
-    padding:15px 20px;
-    box-shadow:0 4px 6px rgba(0,0,0,.2);
-    display:flex;
-    align-items:center;
-}
-
-.logo{
-    cursor:pointer;
-}
-
-.logo img{
-    height:40px;
-    border-radius:5px;
-}
-
-.posts-container{
-    max-width:900px;
-    margin:25px auto;
-    padding:0 15px;
-}
-
-.post{
-    background:#fff;
-    border-radius:10px;
-    overflow:hidden;
-    margin-bottom:25px;
-    box-shadow:0 2px 8px rgba(0,0,0,.15);
-}
-
-.post img{
-    width:100%;
-    display:block;
-}
-
-.content{
-    padding:20px;
-}
-
-.content h2{
-    margin:0 0 10px;
-}
-
-.content p{
-    line-height:1.5;
-    white-space:pre-wrap;
-}
-
-.date{
-    color:#777;
-    font-size:13px;
-    margin-top:15px;
-}
-
-.loading{
-    text-align:center;
-    color:#666;
-    margin-top:50px;
-}
-
-</style>
-</head>
-<body>
-
-<header>
-    <div class="logo" onclick="window.location.href='/'">
-        <img src="TEM1.jpg" alt="TEM Logo">
+    <div class="folder-content">
+      <a href="police.html">📁 Tasmania Police</a>
+      <a href="fire.html">📁 Tasmania Fire Service</a>
+      <a href="ambulance.html">📁 Tasmania Ambulance</a>
     </div>
-</header>
+  </details>
 
-<div class="posts-container" id="posts">
-    <div class="loading">Loading posts...</div>
+  <details>
+    <summary>📁 New South Wales</summary>
+
+    <div class="folder-content">
+      <a href="nsw-police.html">📁 NSW Police</a>
+      <a href="nsw-fire.html">📁 NSW Fire Service</a>
+    </div>
+  </details>
+
 </div>
 
-<script type="module">
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
-
-import {
-    getFirestore,
-    collection,
-    getDocs,
-    query,
-    orderBy
-} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
-
-const firebaseConfig = {
-    apiKey: "AIzaSyAIqLic00FcNgtuKZATMdHU4jRITnYO2A8",
-    authDomain: "temedia20-be031.firebaseapp.com",
-    projectId: "temedia20-be031",
-    storageBucket: "temedia20-be031.firebasestorage.app",
-    messagingSenderId: "514394139848",
-    appId: "1:514394139848:web:7edabb080c12b87bc909fd"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-const postsDiv = document.getElementById("posts");
-
-async function loadPosts(){
-
-    postsDiv.innerHTML = "";
-
-    const q = query(
-        collection(db,"posts"),
-        orderBy("created","desc")
-    );
-
-    const snapshot = await getDocs(q);
-
-    if(snapshot.empty){
-        postsDiv.innerHTML = "<div class='loading'>No posts yet.</div>";
-        return;
-    }
-
-    snapshot.forEach(doc=>{
-
-        const post = doc.data();
-
-        const image = post.image
-            ? `<img src="${post.image}" alt="">`
-            : "";
-
-        const date = post.created
-            ? new Date(post.created.seconds*1000).toLocaleString()
-            : "";
-
-        postsDiv.innerHTML += `
-            <div class="post">
-
-                ${image}
-
-                <div class="content">
-                    <h2>${post.title}</h2>
-
-                    <p>${post.content}</p>
-
-                    <div class="date">${date}</div>
-                </div>
-
-            </div>
-        `;
-
-    });
-
+<style>
+.folder-menu {
+  width: 250px;
+  background: #111;
+  color: white;
+  border: 1px solid #333;
+  padding: 10px;
+  font-family: Arial, sans-serif;
 }
 
-loadPosts();
+.folder-menu details {
+  margin-bottom: 8px;
+}
 
-</script>
+.folder-menu summary {
+  cursor: pointer;
+  padding: 8px;
+  background: #222;
+  border-radius: 4px;
+  list-style: none;
+}
 
-</body>
-</html>
+.folder-menu summary:hover {
+  background: #333;
+}
+
+.folder-content {
+  padding-left: 20px;
+  margin-top: 5px;
+}
+
+.folder-content a {
+  display: block;
+  color: #ccc;
+  text-decoration: none;
+  padding: 7px;
+  font-size: 13px;
+}
+
+.folder-content a:hover {
+  color: white;
+  background: #333;
+}
+</style>
