@@ -12,97 +12,190 @@
     box-sizing: border-box;
 }
 
-body {
-    margin: 0;
-    background: #080808;
-    color: #ddd;
-    font-family: Arial, sans-serif;
+:root {
+    --background: #080808;
+    --panel: #000000;
+    --text: #ffffff;
+    --secondary: #cccccc;
+    --border: #333333;
+    --hover: #202020;
 }
 
-/* Main page */
-.page {
+body.light-mode {
+    --background: #eeeeee;
+    --panel: #ffffff;
+    --text: #111111;
+    --secondary: #555555;
+    --border: #cccccc;
+    --hover: #e5e5e5;
+}
+
+body {
+    margin: 0;
     min-height: 100vh;
+    background: var(--background);
+    color: var(--text);
+    font-family: Arial, sans-serif;
+    transition: background 0.25s, color 0.25s;
+}
+
+/* Top bar */
+.top-bar {
+    width: 100%;
+    height: 65px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0 25px;
+}
+
+/* Theme button */
+.theme-button {
+    background: var(--panel);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 16px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.theme-button:hover {
+    background: var(--hover);
+}
+
+/* Main screen */
+.page {
+    min-height: calc(100vh - 65px);
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 30px;
+    padding: 25px;
 }
 
-/* Main gallery container */
+/* Main gallery */
 .gallery {
     width: 100%;
-    max-width: 1100px;
-    background: #000;
-    border: 1px solid #333;
-    padding: 20px;
+    max-width: 1400px;
+    min-height: 80vh;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 30px;
+    transition: background 0.25s;
 }
 
-/* 2 columns and 5 rows */
+/* 2 columns x 3 rows */
 .category-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(5, 100px);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(3, minmax(150px, 1fr));
     gap: 25px;
+    min-height: 75vh;
 }
 
-/* Individual category */
+/* Category */
 .category {
     display: flex;
     align-items: flex-start;
-    gap: 15px;
+    gap: 20px;
     text-decoration: none;
-    color: white;
-    padding: 5px;
+    color: var(--text);
+    padding: 15px;
+    border: 1px solid transparent;
+    transition: background 0.2s, border 0.2s;
+    min-width: 0;
 }
 
-/* Thumbnail */
+.category:hover {
+    background: var(--hover);
+    border-color: var(--border);
+}
+
+/* Image */
 .category img {
-    width: 110px;
-    height: 80px;
+    width: 150px;
+    height: 110px;
     object-fit: cover;
     flex-shrink: 0;
-    border: 1px solid #222;
+    border: 1px solid var(--border);
 }
 
-/* Category information */
+/* Category details */
 .category-info {
     flex: 1;
     min-width: 0;
 }
 
-/* Category title */
+/* Title */
 .category-title {
-    font-size: 15px;
+    font-size: 17px;
     font-weight: bold;
-    border-bottom: 1px dotted #444;
-    padding-bottom: 5px;
-    margin-bottom: 8px;
+    border-bottom: 1px dotted var(--border);
+    padding-bottom: 8px;
+    margin-bottom: 10px;
 }
 
 /* Description */
 .category-description {
-    font-size: 12px;
-    color: #ccc;
+    font-size: 13px;
+    color: var(--secondary);
+    line-height: 1.5;
 }
 
-/* Hover effect */
-.category:hover .category-title {
-    color: #aaa;
-}
-
-/* Mobile layout */
-@media (max-width: 700px) {
-    .category-grid {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto;
-    }
-
-    .category {
-        min-height: 100px;
+/* Tablet and phone */
+@media (max-width: 800px) {
+    .page {
+        padding: 12px;
     }
 
     .gallery {
         padding: 15px;
+        min-height: auto;
+    }
+
+    .category-grid {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+        min-height: auto;
+        gap: 10px;
+    }
+
+    .category {
+        min-height: 120px;
+        padding: 10px;
+    }
+
+    .category img {
+        width: 110px;
+        height: 85px;
+    }
+
+    .category-title {
+        font-size: 15px;
+    }
+
+    .category-description {
+        font-size: 12px;
+    }
+}
+
+/* Small phones */
+@media (max-width: 400px) {
+    .top-bar {
+        padding: 0 12px;
+    }
+
+    .category {
+        gap: 10px;
+    }
+
+    .category img {
+        width: 90px;
+        height: 75px;
+    }
+
+    .category-title {
+        font-size: 14px;
     }
 }
 </style>
@@ -110,13 +203,20 @@ body {
 
 <body>
 
+<!-- Top right theme button -->
+<div class="top-bar">
+    <button class="theme-button" id="themeButton">
+        ☀️ Light Mode
+    </button>
+</div>
+
 <div class="page">
 
     <div class="gallery">
 
         <div class="category-grid">
 
-            <!-- Category 1 -->
+            <!-- Tasmania Police -->
             <a href="taspol.html" class="category">
                 <img src="taspol.jpg" alt="Tasmania Police">
 
@@ -131,7 +231,7 @@ body {
                 </div>
             </a>
 
-            <!-- Category 2 -->
+            <!-- Tasmania Fire Service -->
             <a href="tfs.html" class="category">
                 <img src="tfs.jpg" alt="Tasmania Fire Service">
 
@@ -146,7 +246,7 @@ body {
                 </div>
             </a>
 
-            <!-- Category 3 -->
+            <!-- Tasmania Ambulance -->
             <a href="at.html" class="category">
                 <img src="ambulance.jpg" alt="Tasmania Ambulance">
 
@@ -161,7 +261,7 @@ body {
                 </div>
             </a>
 
-            <!-- Category 4 -->
+            <!-- Emergency Services -->
             <a href="#" class="category">
                 <img src="emergency.jpg" alt="Emergency Services">
 
@@ -176,7 +276,7 @@ body {
                 </div>
             </a>
 
-            <!-- Category 5 -->
+            <!-- Parks and Wildlife -->
             <a href="#" class="category">
                 <img src="parks.jpg" alt="Parks and Wildlife">
 
@@ -191,9 +291,9 @@ body {
                 </div>
             </a>
 
-            <!-- Category 6 -->
+            <!-- Transport Safety -->
             <a href="#" class="category">
-                <img src="transport.jpg" alt="Transport">
+                <img src="transport.jpg" alt="Transport Safety">
 
                 <div class="category-info">
                     <div class="category-title">
@@ -206,72 +306,25 @@ body {
                 </div>
             </a>
 
-            <!-- Category 7 -->
-            <a href="#" class="category">
-                <img src="medical.jpg" alt="Medical Services">
-
-                <div class="category-info">
-                    <div class="category-title">
-                        Medical Services
-                    </div>
-
-                    <div class="category-description">
-                        Medical and healthcare vehicles
-                    </div>
-                </div>
-            </a>
-
-            <!-- Category 8 -->
-            <a href="#" class="category">
-                <img src="helicopter.jpg" alt="Air Services">
-
-                <div class="category-info">
-                    <div class="category-title">
-                        Air Services
-                    </div>
-
-                    <div class="category-description">
-                        Helicopters and aviation services
-                    </div>
-                </div>
-            </a>
-
-            <!-- Category 9 -->
-            <a href="#" class="category">
-                <img src="marine.jpg" alt="Marine Rescue">
-
-                <div class="category-info">
-                    <div class="category-title">
-                        Volunteer Marine Rescue
-                    </div>
-
-                    <div class="category-description">
-                        Marine rescue and water safety
-                    </div>
-                </div>
-            </a>
-
-            <!-- Category 10 -->
-            <a href="#" class="category">
-                <img src="other.jpg" alt="Other Services">
-
-                <div class="category-info">
-                    <div class="category-title">
-                        Other Services
-                    </div>
-
-                    <div class="category-description">
-                        Other emergency and government services
-                    </div>
-                </div>
-            </a>
-
         </div>
 
     </div>
 
 </div>
 
+<script>
+const themeButton = document.getElementById("themeButton");
+
+themeButton.addEventListener("click", function () {
+    document.body.classList.toggle("light-mode");
+
+    if (document.body.classList.contains("light-mode")) {
+        themeButton.textContent = "🌙 Dark Mode";
+    } else {
+        themeButton.textContent = "☀️ Light Mode";
+    }
+});
+</script>
+
 </body>
 </html>
-
