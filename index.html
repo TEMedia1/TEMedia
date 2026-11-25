@@ -1,59 +1,216 @@
 
-<div class="folder-menu">
-
-  <details>
-    <summary> Tasmania</summary>
-
-    <div class="folder-content">
-      <a href="taspol.html"> Tasmania Police</a>
-      <a href="tfs.html"> Tasmania Fire Service</a>
-      <a href="at.html"> Tasmania Ambulance</a>
-    </div>
-  </details>
-
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Folder Menu</title>
 
 <style>
-.folder-menu {
-  width: 250px;
-  background: #111;
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: #080808;
   color: white;
-  border: 1px solid #333;
-  padding: 10px;
   font-family: Arial, sans-serif;
 }
 
-.folder-menu details {
-  margin-bottom: 8px;
+/* Full screen container */
+.folder-screen {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30px;
 }
 
+/* 2 columns x 5 rows */
+.folder-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(5, 1fr);
+  gap: 20px;
+
+  width: 100%;
+  max-width: 1100px;
+}
+
+/* Folder boxes */
+.folder-menu {
+  background: #111;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 15px;
+  min-height: 120px;
+}
+
+/* Folder heading */
 .folder-menu summary {
   cursor: pointer;
-  padding: 8px;
+  padding: 15px;
   background: #222;
-  border-radius: 4px;
+  border-radius: 5px;
   list-style: none;
+  font-size: 18px;
 }
 
 .folder-menu summary:hover {
   background: #333;
 }
 
+/* Remove default arrow */
+.folder-menu summary::-webkit-details-marker {
+  display: none;
+}
+
+/* Folder contents */
 .folder-content {
-  padding-left: 20px;
-  margin-top: 5px;
+  padding-left: 15px;
+  margin-top: 10px;
 }
 
 .folder-content a {
   display: block;
   color: #ccc;
   text-decoration: none;
-  padding: 7px;
-  font-size: 13px;
+  padding: 10px;
+  font-size: 14px;
+  border-radius: 4px;
 }
 
 .folder-content a:hover {
   color: white;
   background: #333;
 }
+
+/* Responsive for mobile */
+@media (max-width: 600px) {
+  .folder-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+  }
+}
 </style>
+</head>
+
+<body>
+
+<div class="folder-screen">
+
+  <div class="folder-grid">
+
+    <!-- Folder 1 -->
+    <div class="folder-menu">
+      <details>
+        <summary>📁 Tasmania</summary>
+
+        <div class="folder-content">
+          <a href="taspol.html">Tasmania Police</a>
+          <a href="tfs.html">Tasmania Fire Service</a>
+          <a href="at.html">Tasmania Ambulance</a>
+        </div>
+      </details>
+    </div>
+
+    <!-- Folder 2 -->
+    <div class="folder-menu">
+      <details>
+        <summary>📁 Folder 2</summary>
+        <div class="folder-content">
+          <a href="#">Page 1</a>
+          <a href="#">Page 2</a>
+        </div>
+      </details>
+    </div>
+
+    <!-- Folder 3 -->
+    <div class="folder-menu">
+      <details>
+        <summary>📁 Folder 3</summary>
+        <div class="folder-content">
+          <a href="#">Page 1</a>
+        </div>
+      </details>
+    </div>
+
+    <!-- Folder 4 -->
+    <div class="folder-menu">
+      <details>
+        <summary>📁 Folder 4</summary>
+        <div class="folder-content">
+          <a href="#">Page 1</a>
+        </div>
+      </details>
+    </div>
+
+    <!-- Folder 5 -->
+    <div class="folder-menu">
+      <details>
+        <summary>📁 Folder 5</summary>
+        <div class="folder-content">
+          <a href="#">Page 1</a>
+        </div>
+      </details>
+    </div>
+
+    <!-- Folder 6 -->
+    <div class="folder-menu">
+      <details>
+        <summary>📁 Folder 6</summary>
+        <div class="folder-content">
+          <a href="#">Page 1</a>
+        </div>
+      </details>
+    </div>
+
+    <!-- Folder 7 -->
+    <div class="folder-menu">
+      <details>
+        <summary>📁 Folder 7</summary>
+        <div class="folder-content">
+          <a href="#">Page 1</a>
+        </div>
+      </details>
+    </div>
+
+    <!-- Folder 8 -->
+    <div class="folder-menu">
+      <details>
+        <summary>📁 Folder 8</summary>
+        <div class="folder-content">
+          <a href="#">Page 1</a>
+        </div>
+      </details>
+    </div>
+
+    <!-- Folder 9 -->
+    <div class="folder-menu">
+      <details>
+        <summary>📁 Folder 9</summary>
+        <div class="folder-content">
+          <a href="#">Page 1</a>
+        </div>
+      </details>
+    </div>
+
+    <!-- Folder 10 -->
+    <div class="folder-menu">
+      <details>
+        <summary>📁 Folder 10</summary>
+        <div class="folder-content">
+          <a href="#">Page 1</a>
+        </div>
+      </details>
+    </div>
+
+  </div>
+
+</div>
+
+</body>
+</html>
