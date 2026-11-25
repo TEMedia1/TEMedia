@@ -4,213 +4,274 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Folder Menu</title>
+
+<title>Tasmania Categories</title>
 
 <style>
 * {
-  box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 body {
-  margin: 0;
-  min-height: 100vh;
-  background: #080808;
-  color: white;
-  font-family: Arial, sans-serif;
+    margin: 0;
+    background: #080808;
+    color: #ddd;
+    font-family: Arial, sans-serif;
 }
 
-/* Full screen container */
-.folder-screen {
-  width: 100%;
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 30px;
+/* Main page */
+.page {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 30px;
 }
 
-/* 2 columns x 5 rows */
-.folder-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-template-rows: repeat(5, 1fr);
-  gap: 20px;
-
-  width: 100%;
-  max-width: 1100px;
+/* Main gallery container */
+.gallery {
+    width: 100%;
+    max-width: 1100px;
+    background: #000;
+    border: 1px solid #333;
+    padding: 20px;
 }
 
-/* Folder boxes */
-.folder-menu {
-  background: #111;
-  border: 1px solid #333;
-  border-radius: 8px;
-  padding: 15px;
-  min-height: 120px;
+/* 2 columns and 5 rows */
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(5, 100px);
+    gap: 25px;
 }
 
-/* Folder heading */
-.folder-menu summary {
-  cursor: pointer;
-  padding: 15px;
-  background: #222;
-  border-radius: 5px;
-  list-style: none;
-  font-size: 18px;
+/* Individual category */
+.category {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    text-decoration: none;
+    color: white;
+    padding: 5px;
 }
 
-.folder-menu summary:hover {
-  background: #333;
+/* Thumbnail */
+.category img {
+    width: 110px;
+    height: 80px;
+    object-fit: cover;
+    flex-shrink: 0;
+    border: 1px solid #222;
 }
 
-/* Remove default arrow */
-.folder-menu summary::-webkit-details-marker {
-  display: none;
+/* Category information */
+.category-info {
+    flex: 1;
+    min-width: 0;
 }
 
-/* Folder contents */
-.folder-content {
-  padding-left: 15px;
-  margin-top: 10px;
+/* Category title */
+.category-title {
+    font-size: 15px;
+    font-weight: bold;
+    border-bottom: 1px dotted #444;
+    padding-bottom: 5px;
+    margin-bottom: 8px;
 }
 
-.folder-content a {
-  display: block;
-  color: #ccc;
-  text-decoration: none;
-  padding: 10px;
-  font-size: 14px;
-  border-radius: 4px;
+/* Description */
+.category-description {
+    font-size: 12px;
+    color: #ccc;
 }
 
-.folder-content a:hover {
-  color: white;
-  background: #333;
+/* Hover effect */
+.category:hover .category-title {
+    color: #aaa;
 }
 
-/* Responsive for mobile */
-@media (max-width: 600px) {
-  .folder-grid {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto;
-  }
+/* Mobile layout */
+@media (max-width: 700px) {
+    .category-grid {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+    }
+
+    .category {
+        min-height: 100px;
+    }
+
+    .gallery {
+        padding: 15px;
+    }
 }
 </style>
 </head>
 
 <body>
 
-<div class="folder-screen">
+<div class="page">
 
-  <div class="folder-grid">
+    <div class="gallery">
 
-    <!-- Folder 1 -->
-    <div class="folder-menu">
-      <details>
-        <summary>📁 Tasmania</summary>
+        <div class="category-grid">
 
-        <div class="folder-content">
-          <a href="taspol.html">Tasmania Police</a>
-          <a href="tfs.html">Tasmania Fire Service</a>
-          <a href="at.html">Tasmania Ambulance</a>
+            <!-- Category 1 -->
+            <a href="taspol.html" class="category">
+                <img src="taspol.jpg" alt="Tasmania Police">
+
+                <div class="category-info">
+                    <div class="category-title">
+                        Tasmania Police
+                    </div>
+
+                    <div class="category-description">
+                        Police vehicles and emergency services
+                    </div>
+                </div>
+            </a>
+
+            <!-- Category 2 -->
+            <a href="tfs.html" class="category">
+                <img src="tfs.jpg" alt="Tasmania Fire Service">
+
+                <div class="category-info">
+                    <div class="category-title">
+                        Tasmania Fire Service
+                    </div>
+
+                    <div class="category-description">
+                        Fire engines and fire service vehicles
+                    </div>
+                </div>
+            </a>
+
+            <!-- Category 3 -->
+            <a href="at.html" class="category">
+                <img src="ambulance.jpg" alt="Tasmania Ambulance">
+
+                <div class="category-info">
+                    <div class="category-title">
+                        Tasmania Ambulance Service
+                    </div>
+
+                    <div class="category-description">
+                        Ambulances and medical response vehicles
+                    </div>
+                </div>
+            </a>
+
+            <!-- Category 4 -->
+            <a href="#" class="category">
+                <img src="emergency.jpg" alt="Emergency Services">
+
+                <div class="category-info">
+                    <div class="category-title">
+                        Tasmania State Emergency Service
+                    </div>
+
+                    <div class="category-description">
+                        Emergency response and rescue
+                    </div>
+                </div>
+            </a>
+
+            <!-- Category 5 -->
+            <a href="#" class="category">
+                <img src="parks.jpg" alt="Parks and Wildlife">
+
+                <div class="category-info">
+                    <div class="category-title">
+                        Parks and Wildlife Services
+                    </div>
+
+                    <div class="category-description">
+                        Parks, wildlife and conservation
+                    </div>
+                </div>
+            </a>
+
+            <!-- Category 6 -->
+            <a href="#" class="category">
+                <img src="transport.jpg" alt="Transport">
+
+                <div class="category-info">
+                    <div class="category-title">
+                        Transport Safety Inspector
+                    </div>
+
+                    <div class="category-description">
+                        Transport and road safety vehicles
+                    </div>
+                </div>
+            </a>
+
+            <!-- Category 7 -->
+            <a href="#" class="category">
+                <img src="medical.jpg" alt="Medical Services">
+
+                <div class="category-info">
+                    <div class="category-title">
+                        Medical Services
+                    </div>
+
+                    <div class="category-description">
+                        Medical and healthcare vehicles
+                    </div>
+                </div>
+            </a>
+
+            <!-- Category 8 -->
+            <a href="#" class="category">
+                <img src="helicopter.jpg" alt="Air Services">
+
+                <div class="category-info">
+                    <div class="category-title">
+                        Air Services
+                    </div>
+
+                    <div class="category-description">
+                        Helicopters and aviation services
+                    </div>
+                </div>
+            </a>
+
+            <!-- Category 9 -->
+            <a href="#" class="category">
+                <img src="marine.jpg" alt="Marine Rescue">
+
+                <div class="category-info">
+                    <div class="category-title">
+                        Volunteer Marine Rescue
+                    </div>
+
+                    <div class="category-description">
+                        Marine rescue and water safety
+                    </div>
+                </div>
+            </a>
+
+            <!-- Category 10 -->
+            <a href="#" class="category">
+                <img src="other.jpg" alt="Other Services">
+
+                <div class="category-info">
+                    <div class="category-title">
+                        Other Services
+                    </div>
+
+                    <div class="category-description">
+                        Other emergency and government services
+                    </div>
+                </div>
+            </a>
+
         </div>
-      </details>
-    </div>
 
-    <!-- Folder 2 -->
-    <div class="folder-menu">
-      <details>
-        <summary>📁 Folder 2</summary>
-        <div class="folder-content">
-          <a href="#">Page 1</a>
-          <a href="#">Page 2</a>
-        </div>
-      </details>
     </div>
-
-    <!-- Folder 3 -->
-    <div class="folder-menu">
-      <details>
-        <summary>📁 Folder 3</summary>
-        <div class="folder-content">
-          <a href="#">Page 1</a>
-        </div>
-      </details>
-    </div>
-
-    <!-- Folder 4 -->
-    <div class="folder-menu">
-      <details>
-        <summary>📁 Folder 4</summary>
-        <div class="folder-content">
-          <a href="#">Page 1</a>
-        </div>
-      </details>
-    </div>
-
-    <!-- Folder 5 -->
-    <div class="folder-menu">
-      <details>
-        <summary>📁 Folder 5</summary>
-        <div class="folder-content">
-          <a href="#">Page 1</a>
-        </div>
-      </details>
-    </div>
-
-    <!-- Folder 6 -->
-    <div class="folder-menu">
-      <details>
-        <summary>📁 Folder 6</summary>
-        <div class="folder-content">
-          <a href="#">Page 1</a>
-        </div>
-      </details>
-    </div>
-
-    <!-- Folder 7 -->
-    <div class="folder-menu">
-      <details>
-        <summary>📁 Folder 7</summary>
-        <div class="folder-content">
-          <a href="#">Page 1</a>
-        </div>
-      </details>
-    </div>
-
-    <!-- Folder 8 -->
-    <div class="folder-menu">
-      <details>
-        <summary>📁 Folder 8</summary>
-        <div class="folder-content">
-          <a href="#">Page 1</a>
-        </div>
-      </details>
-    </div>
-
-    <!-- Folder 9 -->
-    <div class="folder-menu">
-      <details>
-        <summary>📁 Folder 9</summary>
-        <div class="folder-content">
-          <a href="#">Page 1</a>
-        </div>
-      </details>
-    </div>
-
-    <!-- Folder 10 -->
-    <div class="folder-menu">
-      <details>
-        <summary>📁 Folder 10</summary>
-        <div class="folder-content">
-          <a href="#">Page 1</a>
-        </div>
-      </details>
-    </div>
-
-  </div>
 
 </div>
 
 </body>
 </html>
+
